@@ -154,9 +154,6 @@ public class CsvScannerTest {
       int i = 0, j = 0;
       try {
         while (r.scan()) {
-          if (j == 0 && r.atEndOfRow() && r.token().isEmpty()) { // skip empty lines
-            continue;
-          }
           if (i >= t.output.length) {
             fail(String.format("%s: unexpected number of row %d; want %d max", t.name, i + 1, t.output.length));
           } else if (j >= t.output[i].length) {
@@ -199,7 +196,7 @@ public class CsvScannerTest {
       r.setCommentMarker(t.comment);
       r.setTrim(t.trim);
 
-      int i = 0, j = 0;
+      int i = 0, j;
       String[] values = new String[10];
       try {
         while ((j = r.scanRow(values)) > 0) {
