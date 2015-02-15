@@ -87,12 +87,12 @@ public class CsvScannerTest {
     tests.add(new TestCase("EscapedQuoteAndEmbeddedNewLine", true, "\"a\"\"b\",\"c\"\"\r\nd\"",
         new String[][]{{"a\"b", "c\"\r\nd"}}));
     tests.add(new TestCase("BlankLine", true, "a,b,\"c\"\n\nd,e,f\n\n",
-        new String[][]{{"a", "b", "c"}, {""}, {"d", "e", "f"}, {""}}));
+        new String[][]{{"a", "b", "c"}, {"d", "e", "f"}}));
     tests.add(new TestCase("TrimSpace", false, true, " a,  b,   c\n", new String[][]{{"a", "b", "c"}}));
     tests.add(new TestCase("TrimSpaceQuoted", true, true, " a,b ,\" c \", d \n", new String[][]{{"a", "b", " c ", "d"}}));
     tests.add(new TestCase("LeadingSpace", " a,  b,   c\n", new String[][]{{" a", "  b", "   c"}}));
     tests.add(new TestCase("Comment", false, '#', "#1,2,3\na,b,#\n#comment\nc\n# comment",
-        new String[][]{{""}, {"a", "b", "#"}, {""}, {"c"}, {""}}));
+        new String[][]{{"a", "b", "#"}, {"c"}}));
     tests.add(new TestCase("NoComment", "#1,2,3\na,b,c", new String[][]{{"#1", "2", "3"}, {"a", "b", "c"}}));
     tests.add(new TestCase("StrictQuotes", true, "a \"word\",\"1\"2\",a\",\"b",
         new String[][]{{"a \"word\"", "1\"2", "a\"", "b"}},
@@ -154,6 +154,9 @@ public class CsvScannerTest {
       int i = 0, j = 0;
       try {
         while (r.scan()) {
+          if (j == 0 && r.atEndOfRow() && r.token().isEmpty()) { // skip empty lines
+            continue;
+          }
           if (i >= t.output.length) {
             fail(String.format("%s: unexpected number of row %d; want %d max", t.name, i + 1, t.output.length));
           } else if (j >= t.output[i].length) {
@@ -194,20 +197,19 @@ public class CsvScannerTest {
       r.setCommentMarker(t.comment);
       r.setTrim(t.trim);
 
-      final String[][] output = removeEmptyRows(t.output);
       int i = 0, j = 0;
       String[] values = new String[10];
       try {
         while ((j = r.scanRow(values)) > 0) {
-          if (i >= output.length) {
-            fail(String.format("%s: unexpected number of row %d; want %d max", t.name, i + 1, output.length));
-          } else if (j != output[i].length) {
-            fail(String.format("%s: unexpected number of column %d; want %d at line %d", t.name, j + 1, output[i].length, i + 1));
+          if (i >= t.output.length) {
+            fail(String.format("%s: unexpected number of row %d; want %d max", t.name, i + 1, t.output.length));
+          } else if (j != t.output[i].length) {
+            fail(String.format("%s: unexpected number of column %d; want %d at line %d", t.name, j + 1, t.output[i].length, i + 1));
           }
           String[] row = Arrays.copyOf(values, j);
-          if (!Arrays.equals(row, output[i])) {
+          if (!Arrays.equals(row, t.output[i])) {
             fail(String.format("%s: unexpected row %s; want %s at line %d", t.name,
-                Arrays.toString(row), Arrays.toString(output[i]), i + 1));
+                Arrays.toString(row), Arrays.toString(t.output[i]), i + 1));
           }
           i++;
         }
@@ -230,26 +232,4 @@ public class CsvScannerTest {
 
   // TODO scanRow with values = 0, 1, ...
   // TODO skipRow "colA,colB\n# comment...\nvalue11,value12\n# comment...\nvalue21,value22"
-
-  private static String[][] removeEmptyRows(String[][] output) {
-    if (output == null || output.length == 0) {
-      return output;
-    }
-    int n = 0;
-    for (String[] row : output) {
-      if (row.length == 1 && Objects.equals(row[0], "")) { // empty row
-        continue;
-      }
-      n++;
-    }
-    final String[][] rows = new String[n][];
-    n = 0;
-    for (String[] row : output) {
-      if (row.length == 1 && Objects.equals(row[0], "")) { // empty row
-        continue;
-      }
-      rows[n++] = row;
-    }
-    return rows;
-  }
 }

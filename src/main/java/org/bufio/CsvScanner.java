@@ -2,8 +2,6 @@ package org.bufio;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
-import java.util.Arrays;
 
 // TODO lazy
 // setSkipEmptyLines/ ignore empty lines
@@ -33,7 +31,7 @@ public class CsvScanner extends Scanner<String> {
   private final boolean quoted; // withQuote(char) + withEscape(char)
   // trim spaces (only on not-quoted values). Break rfc4180 rule: "Spaces are considered part of a field and should not be ignored."
   private boolean trim; // withIgnoreSurroundingSpaces
-  // character marking the start of a line comment. When specified, line comment appears as empty line.
+  // character marking the start of a line comment. When specified, line comments are ignored/skipped.
   private char comment; // withCommentMarker
 
   private int lineno;
@@ -131,12 +129,12 @@ public class CsvScanner extends Scanner<String> {
         if (data[i] == '\n') {
           lineno++;
           advance(i + 1);
-          return "";
+          return null;
         }
       }
       if (atEOF) {
         advance(end);
-        return "";
+        return null;
       }
     } else { // unquoted field
       // Scan until separator or newline, marking end of field.
@@ -214,17 +212,14 @@ public class CsvScanner extends Scanner<String> {
   public int scanRow(String[] values) throws IOException {
     int i;
     for (i = 0; i < values.length && scan(); i++) {
-       String token = token();
       if (i == 0) {
-        if (eor && token.isEmpty()) { // skip empty line (or line comment)
-          while ((token = token()).isEmpty() && eor) {
-            if (!scan()) {
-              return i;
-            }
+        while (eor && token().isEmpty()) { // skip empty line
+          if (!scan()) {
+            return i;
           }
         }
       }
-      values[i] = token;
+      values[i] = token();
       if (eor) {
         return i + 1;
       }
