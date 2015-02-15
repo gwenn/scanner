@@ -185,6 +185,8 @@ public class CsvScannerTest {
         } else {
           fail(String.format("%s: unexpected error '%s'", t.name, e));
         }
+      } finally {
+        r.close();
       }
     }
   }

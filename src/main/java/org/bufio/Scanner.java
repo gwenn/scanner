@@ -84,11 +84,11 @@ public abstract class Scanner<T> implements Closeable {
   // The function to split the tokens.
   protected abstract T split(char[] data, int start, int end, boolean atEOF) throws IOException;
 
-  public T token() {
+  protected T token() {
     return token;
   }
 
-  public char peek() throws IOException {
+  protected char peek() throws IOException {
     while (true) {
       if (end > start) {
         return buf[start];
