@@ -144,7 +144,7 @@ public class CsvScannerTest {
   }
 
   @Test
-  public void testScan() {
+  public void testScan() throws IOException {
     CsvScanner r;
     for (TestCase t : tests) {
       r = new CsvScanner(new StringReader(t.input), t.sep == 0 ? ',' : t.sep, t.quoted);
@@ -172,7 +172,7 @@ public class CsvScannerTest {
         if (t.error != null) {
           fail(String.format("%s: error '%s', want error '%s'", t.name, null, t.error));
         }
-      } catch (IOException e) {
+      } catch (ScanException e) {
         if (t.error != null) {
           if (!e.getMessage().contains(t.error)) {
             fail(String.format("%s: error '%s', want error '%s'", t.name, e, t.error));
@@ -189,7 +189,7 @@ public class CsvScannerTest {
   }
 
   @Test
-  public void testScanRow() {
+  public void testScanRow() throws IOException {
     CsvScanner r;
     for (TestCase t : tests) {
       r = new CsvScanner(new StringReader(t.input), t.sep == 0 ? ',' : t.sep, t.quoted);
@@ -215,7 +215,7 @@ public class CsvScannerTest {
         if (t.error != null) {
           fail(String.format("%s: error '%s', want error '%s'", t.name, null, t.error));
         }
-      } catch (IOException e) {
+      } catch (ScanException e) {
         if (t.error != null) {
           if (!e.getMessage().contains(t.error)) {
             fail(String.format("%s: error '%s', want error '%s'", t.name, e, t.error));
@@ -225,6 +225,8 @@ public class CsvScannerTest {
         } else {
           fail(String.format("%s: unexpected error '%s'", t.name, e));
         }
+      } finally {
+        r.close();
       }
     }
   }

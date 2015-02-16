@@ -62,7 +62,7 @@ public abstract class Scanner<T> implements Closeable {
     // Is the buffer full? If so, resize.
     if (end == buf.length) {
       if (buf.length >= maxTokenSize) {
-        throw new IOException("token too long");
+        throw new ScanException("token too long");
       }
       int newSize = Math.max(buf.length * 2, maxTokenSize);
       char[] newBuf = new char[newSize];
@@ -82,7 +82,7 @@ public abstract class Scanner<T> implements Closeable {
   }
 
   // The function to split the tokens.
-  protected abstract T split(char[] data, int start, int end, boolean atEOF) throws IOException;
+  protected abstract T split(char[] data, int start, int end, boolean atEOF) throws ScanException;
 
   protected T token() {
     return token;
@@ -101,21 +101,18 @@ public abstract class Scanner<T> implements Closeable {
   }
 
   @Override
-  public void close() {
+  public void close() throws IOException {
     if (r != null) {
-      try {
-        r.close();
-      } catch (IOException ignored) {
-      }
+      r.close();
     }
   }
 
-  protected void advance(int n) throws IOException {
+  protected void advance(int n) throws ScanException {
     if (n < 0) {
-      throw new IOException("SplitFunc returns negative advance count");
+      throw new ScanException("SplitFunc returns negative advance count");
     }
     if (n > end) {
-      throw new IOException("SplitFunc returns advance count beyond input");
+      throw new ScanException("SplitFunc returns advance count beyond input");
     }
     start = n;
   }

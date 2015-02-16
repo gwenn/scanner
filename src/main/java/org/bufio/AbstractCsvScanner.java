@@ -56,7 +56,7 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
   }
 
   @Override
-  protected T split(char[] data, int start, int end, boolean atEOF) throws IOException {
+  protected T split(char[] data, int start, int end, boolean atEOF) throws ScanException {
     if (atEOF && end == start) {
       if (eor) {
         return null;
@@ -95,7 +95,7 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
           return unescapeQuotes(data, start + 1, i - 2, escapedQuotes);
         }
         if (pc == '"' && c != '\r') {
-          throw new IOException(String.format("unescaped %c character at line %d", pc, lineno));
+          throw new ScanException(String.format("unescaped %c character at line %d", pc, lineno));
         }
         ppc = pc;
         pc = c;
@@ -107,7 +107,7 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
           return unescapeQuotes(data, start+1, end - 1, escapedQuotes);
         }
         // If we're at EOF, we have a non-terminated field.
-        throw new IOException(String.format("non-terminated quoted field at line %d", startLineno));
+        throw new ScanException(String.format("non-terminated quoted field at line %d", startLineno));
       }
     } else if (eor && comment != 0 && start < end && data[start] == comment) { // line comment
       for (int i = start; i < end; i++) {
