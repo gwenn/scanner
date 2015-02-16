@@ -18,7 +18,7 @@ import java.io.Reader;
  *       }
  *     }
  * </pre></blockquote>
- * <p>
+ * </p>
  */
 public class CsvScanner extends AbstractCsvScanner<String> {
   /**
@@ -56,7 +56,7 @@ public class CsvScanner extends AbstractCsvScanner<String> {
    *       // ...
    *     }
    * </pre></blockquote>
-   * <p>
+   * </p>
    */
   public int scanRow(String[] values) throws IOException {
     int i;

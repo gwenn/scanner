@@ -104,7 +104,7 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
         if (c == '"') {
           eor = true;
           advance(end);
-          return unescapeQuotes(data, start+1, end - 1, escapedQuotes);
+          return unescapeQuotes(data, start + 1, end - 1, escapedQuotes);
         }
         // If we're at EOF, we have a non-terminated field.
         throw new ScanException(String.format("non-terminated quoted field at line %d", startLineno));
@@ -196,7 +196,7 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
 
   private T newToken(char[] data, int start, int end, boolean quoted) {
     if (trim && !quoted) {
-      while (end > start && Character.isWhitespace(data[end-1])) {
+      while (end > start && Character.isWhitespace(data[end - 1])) {
         end--;
       }
       while (start < end && Character.isWhitespace(data[start])) {

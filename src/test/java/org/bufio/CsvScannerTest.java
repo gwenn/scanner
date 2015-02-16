@@ -13,14 +13,15 @@ import static org.junit.Assert.fail;
 
 public class CsvScannerTest {
   private static class TestCase {
-    private String name;
-    private String input;
-    private String[][] output;
+    private final String name;
+    private final String input;
+    private final String[][] output;
 
-    private char sep;
+    private char sep = ',';
     private boolean quoted;
     private boolean trim;
     private char comment;
+    private boolean skipEmptyLines = true;
 
     private String error;
     private int line; // expected error line if != 0
@@ -36,26 +37,31 @@ public class CsvScannerTest {
       this(name, input, output);
       this.quoted = quoted;
     }
-    public TestCase(String name, char sep, String input, String[][] output) {
-      this(name, input, output);
+
+    public TestCase withSeparator(char sep) {
       this.sep = sep;
+      return this;
     }
-    public TestCase(String name, boolean quoted, boolean trim, String input, String[][] output) {
-      this(name, input, output);
-      this.quoted = quoted;
-      this.trim = trim;
+
+    public TestCase withTrim() {
+      trim = true;
+      return this;
     }
-    public TestCase(String name, boolean quoted, char comment, String input, String[][] output) {
-      this(name, input, output);
-      this.quoted = quoted;
+
+    public TestCase withComment(char comment) {
       this.comment = comment;
+      return this;
     }
-    public TestCase(String name, boolean quoted, String input, String[][] output, String error, int line, int column) {
-      this(name, input, output);
-      this.quoted = quoted;
+
+    public TestCase withError(String error, int line, int column) {
       this.error = error;
       this.line = line;
       this.column = column;
+      return this;
+    }
+    public TestCase withEmptyLines() {
+      this.skipEmptyLines = false;
+      return this;
     }
   }
 
@@ -75,7 +81,7 @@ public class CsvScannerTest {
         {"a,a", "b\"bb", "ccc"},
         {"zzz", "yyy", "xxx"},}));
     tests.add(new TestCase("NoEOLTest", "a,b,c", new String[][]{{"a", "b", "c"}}));
-    tests.add(new TestCase("Semicolon", ';', "a;b;c\n", new String[][]{{"a", "b", "c"}}));
+    tests.add(new TestCase("Semicolon", "a;b;c\n", new String[][]{{"a", "b", "c"}}).withSeparator(';'));
     tests.add(new TestCase("MultiLine", true, "\"two\n" +
         "line\",\"one line\",\"three\n" +
         "line\n" +
@@ -88,26 +94,28 @@ public class CsvScannerTest {
         new String[][]{{"a\"b", "c\"\r\nd"}}));
     tests.add(new TestCase("BlankLine", true, "a,b,\"c\"\n\nd,e,f\n\n",
         new String[][]{{"a", "b", "c"}, {"d", "e", "f"}}));
-    tests.add(new TestCase("TrimSpace", false, true, " a,  b,   c\n", new String[][]{{"a", "b", "c"}}));
-    tests.add(new TestCase("TrimSpaceQuoted", true, true, " a,b ,\" c \", d \n", new String[][]{{"a", "b", " c ", "d"}}));
+    tests.add(new TestCase("BlankLine", true, "a,b,\"c\"\n\nd,e,f\n\n",
+        new String[][]{{"a", "b", "c"}, {""}, {"d", "e", "f"}, {""}}).withEmptyLines());
+    tests.add(new TestCase("TrimSpace", false, " a,  b,   c\n", new String[][]{{"a", "b", "c"}}).withTrim());
+    tests.add(new TestCase("TrimSpaceQuoted", true, " a,b ,\" c \", d \n", new String[][]{{"a", "b", " c ", "d"}}).withTrim());
     tests.add(new TestCase("LeadingSpace", " a,  b,   c\n", new String[][]{{" a", "  b", "   c"}}));
-    tests.add(new TestCase("Comment", false, '#', "#1,2,3\na,b,#\n#comment\nc\n# comment",
-        new String[][]{{"a", "b", "#"}, {"c"}}));
+    tests.add(new TestCase("Comment", false, "#1,2,3\na,b,#\n#comment\nc\n# comment",
+        new String[][]{{"a", "b", "#"}, {"c"}}).withComment('#'));
     tests.add(new TestCase("NoComment", "#1,2,3\na,b,c", new String[][]{{"#1", "2", "3"}, {"a", "b", "c"}}));
     tests.add(new TestCase("StrictQuotes", true, "a \"word\",\"1\"2\",a\",\"b",
-        new String[][]{{"a \"word\"", "1\"2", "a\"", "b"}},
-        "unescaped \" character", 1, 2));
+        new String[][]{{"a \"word\"", "1\"2", "a\"", "b"}}).withError("unescaped \" character", 1, 2));
     // TODO LazyQuotes, BareQuotes,
     tests.add(new TestCase("BareDoubleQuotes", true, "a\"\"b,c", new String[][]{{"a\"\"b", "c"}}));
-    tests.add(new TestCase("TrimQuote", true, true, " \"a\",\" b\",c", new String[][]{{"\"a\"", " b", "c"}}));
+    tests.add(new TestCase("TrimQuote", true, " \"a\",\" b\",c", new String[][]{{"\"a\"", " b", "c"}}).withTrim());
     tests.add(new TestCase("BareQuote", true, "a \"word\",\"b\"", new String[][]{{"a \"word\"", "b"}}));
     tests.add(new TestCase("TrailingQuote", true, "\"a word\",b\"", new String[][]{{"a word", "b\""}}));
-    tests.add(new TestCase("ExtraneousQuote", true, "\"a \"word\",\"b\"", null, "unescaped \" character", 1, 1));
+    tests.add(new TestCase("ExtraneousQuote", true, "\"a \"word\",\"b\"", null).
+        withError("unescaped \" character", 1, 1));
     tests.add(new TestCase("FieldCount", "a,b,c\nd,e", new String[][]{{"a", "b", "c"}, {"d", "e"}}));
     tests.add(new TestCase("TrailingCommaEOF", "a,b,c,", new String[][]{{"a", "b", "c", ""}}));
     tests.add(new TestCase("TrailingCommaEOL", "a,b,c,\n", new String[][]{{"a", "b", "c", ""}}));
-    tests.add(new TestCase("TrailingCommaSpaceEOF", false, true, "a,b,c, ", new String[][]{{"a", "b", "c", ""}}));
-    tests.add(new TestCase("TrailingCommaSpaceEOL", false, true, "a,b,c, \n", new String[][]{{"a", "b", "c", ""}}));
+    tests.add(new TestCase("TrailingCommaSpaceEOF", false, "a,b,c, ", new String[][]{{"a", "b", "c", ""}}).withTrim());
+    tests.add(new TestCase("TrailingCommaSpaceEOL", false, "a,b,c, \n", new String[][]{{"a", "b", "c", ""}}).withTrim());
     tests.add(new TestCase("TrailingCommaLine3", "a,b,c\nd,e,f\ng,hi,",
         new String[][]{{"a", "b", "c"}, {"d", "e", "f"}, {"g", "hi", ""}}));
     tests.add(new TestCase("NotTrailingComma3", "a,b,c, \n", new String[][]{{"a", "b", "c", " "}}));
@@ -137,19 +145,20 @@ public class CsvScannerTest {
     tests.add(new TestCase("6287", "Field1,Field2,\"LazyQuotes\" Field3,Field4,Field5",
         new String[][]{{"Field1", "Field2", "\"LazyQuotes\" Field3", "Field4", "Field5"}}));
     tests.add(new TestCase("6258", true, "\"Field1\",\"Field2 \"LazyQuotes\"\",\"Field3\",\"Field4\"",
-        new String[][]{{"Field1", "Field2 \"LazyQuotes\"", "Field3", "Field4"}},
-        "unescaped \" character", 1, 2));
-    tests.add(new TestCase("3150", '\t', "3376027\t”S” Falls\t\"S\" Falls\t\t4.53333",
-        new String[][]{{"3376027", "”S” Falls", "\"S\" Falls", "", "4.53333"}}));
+        new String[][]{{"Field1", "Field2 \"LazyQuotes\"", "Field3", "Field4"}}).
+        withError("unescaped \" character", 1, 2));
+    tests.add(new TestCase("3150", "3376027\t”S” Falls\t\"S\" Falls\t\t4.53333",
+        new String[][]{{"3376027", "”S” Falls", "\"S\" Falls", "", "4.53333"}}).withSeparator('\t'));
   }
 
   @Test
   public void testScan() throws IOException {
     CsvScanner r;
     for (TestCase t : tests) {
-      r = new CsvScanner(new StringReader(t.input), t.sep == 0 ? ',' : t.sep, t.quoted);
+      r = new CsvScanner(new StringReader(t.input), t.sep, t.quoted);
       r.setCommentMarker(t.comment);
       r.setTrim(t.trim);
+      r.setSkipEmptyLines(t.skipEmptyLines);
 
       int i = 0, j = 0;
       try {
@@ -192,9 +201,10 @@ public class CsvScannerTest {
   public void testScanRow() throws IOException {
     CsvScanner r;
     for (TestCase t : tests) {
-      r = new CsvScanner(new StringReader(t.input), t.sep == 0 ? ',' : t.sep, t.quoted);
+      r = new CsvScanner(new StringReader(t.input), t.sep, t.quoted);
       r.setCommentMarker(t.comment);
       r.setTrim(t.trim);
+      r.setSkipEmptyLines(t.skipEmptyLines);
 
       int i = 0, j;
       String[] values = new String[10];
