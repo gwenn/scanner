@@ -94,7 +94,7 @@ public class CsvScannerTest {
         new String[][]{{"a\"b", "c\"\r\nd"}}));
     tests.add(new TestCase("BlankLine", true, "a,b,\"c\"\n\nd,e,f\n\n",
         new String[][]{{"a", "b", "c"}, {"d", "e", "f"}}));
-    tests.add(new TestCase("BlankLine", true, "a,b,\"c\"\n\nd,e,f\n\n",
+    tests.add(new TestCase("EmptyLine", true, "a,b,\"c\"\n\nd,e,f\n\n",
         new String[][]{{"a", "b", "c"}, {""}, {"d", "e", "f"}, {""}}).withEmptyLines());
     tests.add(new TestCase("TrimSpace", false, " a,  b,   c\n", new String[][]{{"a", "b", "c"}}).withTrim());
     tests.add(new TestCase("TrimSpaceQuoted", true, " a,b ,\" c \", d \n", new String[][]{{"a", "b", " c ", "d"}}).withTrim());
@@ -181,6 +181,9 @@ public class CsvScannerTest {
         if (t.error != null) {
           fail(String.format("%s: error '%s', want error '%s'", t.name, null, t.error));
         }
+        if (i != t.output.length) {
+          fail(String.format("%s: unexpected number of row %d; want %d", t.name, i, t.output.length));
+        }
       } catch (ScanException e) {
         if (t.error != null) {
           if (!e.getMessage().contains(t.error)) {
@@ -224,6 +227,9 @@ public class CsvScannerTest {
         }
         if (t.error != null) {
           fail(String.format("%s: error '%s', want error '%s'", t.name, null, t.error));
+        }
+        if (i != t.output.length) {
+          fail(String.format("%s: unexpected number of row %d; want %d", t.name, i, t.output.length));
         }
       } catch (ScanException e) {
         if (t.error != null) {

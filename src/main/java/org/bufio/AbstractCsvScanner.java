@@ -22,6 +22,8 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
   private boolean eor;
   // true when at the begin of a row
   private boolean sor;
+  // true for line comment or empty line
+  private boolean noValue;
 
   /**
    * Create a "standard" CSV reader (separator is comma and quoted mode active)
@@ -57,6 +59,16 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
 
   @Override
   protected T split(char[] data, int start, int end, boolean atEOF) throws ScanException {
+    while (true) {
+      T token = _split(data, start, end, atEOF);
+      if (!noValue) {
+        return token;
+      }
+      noValue = false;
+      start = position();
+    }
+  }
+  private T _split(char[] data, int start, int end, boolean atEOF) throws ScanException {
     if (atEOF && end == start) {
       if (eor) {
         return null;
@@ -114,6 +126,7 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
         if (data[i] == '\n') {
           lineno++;
           advance(i + 1);
+          noValue = true;
           return null;
         }
       }
@@ -204,6 +217,7 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
       }
     }
     if (start == end && !quoted && sor && eor && skipEmptyLines) {
+      noValue = true;
       return null;
     }
     return newToken(data, start, end);

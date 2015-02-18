@@ -40,7 +40,7 @@ public abstract class Scanner<T> implements Closeable {
         }
       }
       // We cannot generate a token with what we are holding.
-      // If we've already hit EOF or an I/O error, we are done.
+      // If we've already hit EOF, we are done.
       if (eof) {
         start = 0;
         end = 0;
@@ -115,5 +115,9 @@ public abstract class Scanner<T> implements Closeable {
       throw new ScanException("SplitFunc returns advance count beyond input");
     }
     start = n;
+  }
+
+  protected int position() {
+    return start;
   }
 }
