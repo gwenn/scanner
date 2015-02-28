@@ -20,13 +20,11 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
   private int lineno;
   // true when the most recent field has been terminated by a newline (not a separator).
   private boolean eor;
-  // true when at the begin of a row
-  private boolean sor;
-  // true for line comment or empty line
-  private boolean noValue;
+  // current column (first column is 1)
+  private int column;
 
   /**
-   * Create a "standard" CSV reader (separator is comma and quoted mode active)
+   * Creates a "standard" CSV reader (separator is comma and quoted mode active)
    */
   protected AbstractCsvScanner(Reader r) {
     this(r, ',', true);
@@ -44,14 +42,19 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
   protected abstract T newToken(char[] data, int start, int end);
 
   /**
-   * Return current line number
+   * Returns current line number
    */
   public int lineno() {
     return lineno;
   }
 
   /**
-   * Return `true` when the most recent field has been terminated by a newline (not a separator).
+   * Returns current column (first column is 1).
+   */
+  public int column() { return column; }
+
+  /**
+   * Returns `true` when the most recent field has been terminated by a newline (not a separator).
    */
   public boolean atEndOfRow() {
     return eor;
@@ -59,21 +62,24 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
 
   @Override
   protected T split(char[] data, int start, int end, boolean atEOF) throws ScanException {
-    while (true) {
-      T token = _split(data, start, end, atEOF);
-      if (!noValue) {
-        return token;
-      }
-      noValue = false;
-      start = position();
+    if (eor) {
+      column = 1;
+    } else {
+      column++;
     }
+    final T token = _split(data, start, end, atEOF);
+    if (token == null) {
+      if (column > 1) {
+        column--;
+      }
+    }
+    return token;
   }
   private T _split(char[] data, int start, int end, boolean atEOF) throws ScanException {
     if (atEOF && end == start) {
       if (eor) {
         return null;
       }
-      sor = eor;
       eor = true;
       return newToken(data, start, end, false);
     }
@@ -126,7 +132,6 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
         if (data[i] == '\n') {
           lineno++;
           advance(i + 1);
-          noValue = true;
           return null;
         }
       }
@@ -135,7 +140,6 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
         return null;
       }
     } else { // unquoted field
-      sor = eor;
       // Scan until separator or newline, marking end of field.
       char c, pc = 0;
       for (int i = start; i < end; i++) {
@@ -165,7 +169,7 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
   }
 
   /**
-   * Skip `n` rows
+   * Skips `n` rows
    */
   public void skipRows(int n) throws IOException {
     int i = 0;
@@ -177,14 +181,14 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
   }
 
   /**
-   * Set the character marking the start of a line comment. When specified (not 0), line comment appears as empty line.
+   * Sets the character marking the start of a line comment. When specified (not 0), line comment appears as empty line.
    */
   public void setCommentMarker(char comment) {
     this.comment = comment;
   }
 
   /**
-   * Trim spaces (only on not-quoted values). Break rfc4180 rule: "Spaces are considered part of a field and should not be ignored."
+   * Trims spaces (only on not-quoted values). Break rfc4180 rule: "Spaces are considered part of a field and should not be ignored."
    */
   public void setTrim(boolean trim) {
     this.trim = trim;
@@ -216,8 +220,7 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
         start++;
       }
     }
-    if (start == end && !quoted && sor && eor && skipEmptyLines) {
-      noValue = true;
+    if (start == end && !quoted && column == 1 && eor && skipEmptyLines) {
       return null;
     }
     return newToken(data, start, end);

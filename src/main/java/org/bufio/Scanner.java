@@ -11,7 +11,7 @@ public abstract class Scanner<T> implements Closeable {
   // The reader provided by the client.
   private final Reader r;
   // Maximum size of a token
-  private int maxTokenSize;
+  private final int maxTokenSize;
   // Last token returned by split.
   private T token;
   // Buffer used as argument to split.
@@ -25,8 +25,8 @@ public abstract class Scanner<T> implements Closeable {
 
   protected Scanner(Reader r) {
     this.r = r;
-    this.maxTokenSize = 64 * 1024;
-    this.buf = new char[4096]; // Plausible starting size; needn't be large.
+    maxTokenSize = 64 * 1024;
+    buf = new char[4096]; // Plausible starting size; needn't be large.
   }
 
   public boolean scan() throws IOException {
@@ -34,9 +34,12 @@ public abstract class Scanner<T> implements Closeable {
     while (true) {
       // See if we can get a token with what we already have.
       if (end > start || eof) {
+        int pstart = start;
         token = split(buf, start, end, eof);
         if (token != null) {
           return true;
+        } else if (pstart != start) {
+          continue;
         }
       }
       // We cannot generate a token with what we are holding.
@@ -81,7 +84,7 @@ public abstract class Scanner<T> implements Closeable {
     }
   }
 
-  // The function to split the tokens.
+  /** The function to split the tokens. */
   protected abstract T split(char[] data, int start, int end, boolean atEOF) throws ScanException;
 
   protected T token() {
