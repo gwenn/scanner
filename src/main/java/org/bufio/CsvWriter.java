@@ -21,41 +21,67 @@ public class CsvWriter implements Closeable, Flushable {
   private boolean useCRLF;
   // true at start of row
   private boolean sor;
+  // character marking the start of a line comment.
+  private char comment;
 
-  /**
-   * Creates a "standard" CSV writer (separator is comma and quoted mode active)
-   */
+  private char[] buf;
+
+  /** Creates a "standard" CSV writer (separator is comma and quoted mode active) */
   public CsvWriter(Writer w) {
     this(w, ',', true);
   }
 
-  /**
-   * Returns a new CSV writer
-   */
+  /** Returns a new CSV writer */
   public CsvWriter(Writer w, char sep, boolean quoted) {
+    if (w == null) {
+      throw new IllegalArgumentException("null writer");
+    }
     this.w = w;
     this.sep = sep;
     this.quoted = quoted;
     sor = true;
+    buf = new char[4096];
   }
 
-  /*public void writeRow(String... values) throws IOException {
+  public void writeRow(String... values) throws IOException {
     for (String value : values) {
-      write(value); // FIXME
+      write(value);
     }
     endOfRow();
-  }*/
+  }
 
-  /**
-   * Ensures that value is quoted when needed.
-   */
+  public void writeComment(String... values) throws IOException {
+    boolean first = true;
+    for (String value : values) {
+      if (first && comment != 0) {
+        first = false;
+        write(comment + value);
+        continue;
+      }
+      write(value);
+    }
+    endOfRow();
+  }
+
+  /** Ensures that value is quoted when needed. */
   public void write(char[] value) throws IOException {
     write(value, 0, value.length);
   }
 
-  /**
-   * Ensures that value is quoted when needed.
-   */
+  /** Ensures that value is quoted when needed. */
+  public void write(String value) throws IOException {
+    write(value, 0, value.length());
+  }
+
+  public void write(String str, int off, int len) throws IOException {
+    if (len > buf.length) { // FIXME
+      buf = new char[len];
+    }
+    str.getChars(off, len, buf, 0);
+    write(buf, 0, len);
+  }
+
+  /** Ensures that value is quoted when needed. */
   public void write(char[] data, int start, int end) throws IOException {
     if (!sor) {
       w.append(sep);
@@ -73,7 +99,7 @@ public class CsvWriter implements Closeable, Flushable {
         }
         w.write(data, last, i + 1 - last);
         if (c == '"') {
-          w.write('"');
+          w.write('"'); // escaped with another double quote
         }
         last = i + 1;
       }
@@ -96,9 +122,7 @@ public class CsvWriter implements Closeable, Flushable {
     sor = false;
   }
 
-  /**
-   * Tells when a line break must be inserted.
-   */
+  /** Tells when a line break must be inserted. */
   public void endOfRow() throws IOException {
     if (useCRLF) {
       w.write('\r');
@@ -107,8 +131,13 @@ public class CsvWriter implements Closeable, Flushable {
     sor = true;
   }
 
+  /** Use \r\n as the line terminator. */
   public void useCRLF() {
     useCRLF = true;
+  }
+  /** Sets the character marking the start of a line comment. */
+  public void setCommentMarker(char comment) {
+    this.comment = comment;
   }
 
   @Override

@@ -24,6 +24,9 @@ public abstract class Scanner<T> implements Closeable {
   private boolean eof;
 
   protected Scanner(Reader r) {
+    if (r == null) {
+      throw new IllegalArgumentException("null reader");
+    }
     this.r = r;
     maxTokenSize = 64 * 1024;
     buf = new char[4096]; // Plausible starting size; needn't be large.
@@ -105,9 +108,7 @@ public abstract class Scanner<T> implements Closeable {
 
   @Override
   public void close() throws IOException {
-    if (r != null) {
-      r.close();
-    }
+    r.close();
   }
 
   protected void advance(int n) throws ScanException {

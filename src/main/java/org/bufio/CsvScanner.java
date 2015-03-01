@@ -8,7 +8,7 @@ import java.io.Reader;
  * (compatible with rfc4180 and extended with the option of having a separator other than ",").
  * Successive calls to the `scan` method will step through the 'fields', skipping the separator/newline between the fields.
  * The `atEndOfRow` method tells when a field is terminated by a line break.
- * <p><blockquote><pre>
+ * <pre>{@code
  *     CsvScanner s;
  *     while (s.scan())) {
  *       String value = s.value();
@@ -17,8 +17,7 @@ import java.io.Reader;
  *         // ...
  *       }
  *     }
- * </pre></blockquote>
- * </p>
+ * }</pre>
  */
 public class CsvScanner extends AbstractCsvScanner<String> {
   /**
@@ -48,7 +47,7 @@ public class CsvScanner extends AbstractCsvScanner<String> {
    * Extra fields are skipped (when the number of fields is greater than `values` size).
    * Returns the number of values read (see #column()).
    * At EOF, returns 0.
-   * <p><blockquote><pre>
+   * <pre>{@code
    *     CsvScanner s;
    *     String[] values = new String[20]; // max columns
    *     int n;
@@ -56,8 +55,7 @@ public class CsvScanner extends AbstractCsvScanner<String> {
    *       String[] row = Arrays.copyOf(values, n);
    *       // ...
    *     }
-   * </pre></blockquote>
-   * </p>
+   * }</pre>
    */
   public int scanRow(String[] values) throws IOException {
     int i;
