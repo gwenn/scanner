@@ -94,7 +94,7 @@ public abstract class Scanner<T> implements Closeable {
     return token;
   }
 
-  protected char peek() throws IOException {
+  public char peek() throws IOException {
     while (true) {
       if (end > start) {
         return buf[start];
