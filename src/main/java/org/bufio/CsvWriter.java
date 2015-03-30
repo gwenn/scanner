@@ -4,6 +4,9 @@ import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.Writer;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 
 /**
  * CsvPrinter provides an interface for writing CSV data.
@@ -43,9 +46,37 @@ public class CsvWriter implements Closeable, Flushable {
     buf = new char[4096];
   }
 
+  // Exports result to CSV.
+  public void writeResultSet(ResultSet rs/*TODO, String nullValue*/, boolean headers) throws IOException, SQLException {
+    final ResultSetMetaData metaData = rs.getMetaData();
+    final int nCol = metaData.getColumnCount();
+    if (headers) {
+      for (int i = 1; i <= nCol; i++) {
+        if (i == 1 && comment != 0) {
+          write(comment + metaData.getColumnLabel(i));
+          continue;
+        }
+        write(metaData.getColumnLabel(i));
+      }
+      endOfRow();
+    }
+    while (rs.next()) {
+      for (int i = 1; i <= nCol; i++) {
+        writeValue(rs.getObject(i));
+      }
+      endOfRow();
+    }
+  }
+
   public void writeRow(String... values) throws IOException {
     for (String value : values) {
       write(value);
+    }
+    endOfRow();
+  }
+  public void writeRow(Iterable<?> values) throws IOException {
+    for (Object value : values) {
+      writeValue(value);
     }
     endOfRow();
   }
@@ -61,6 +92,25 @@ public class CsvWriter implements Closeable, Flushable {
       write(value);
     }
     endOfRow();
+  }
+
+  // Value's type is used to encode value to text.
+  public void writeValue(Object value) throws IOException {
+    if (value == null) {
+      write(buf, 0, 0);
+    } else if (value instanceof String) {
+      write((String) value);
+    } else if (value instanceof Number) {
+      write(value.toString());
+    } else if (value instanceof Boolean) {
+      write(value.toString()); // TODO parameterizable ("true"|"false")
+    } else if (value instanceof Character) {
+      write(value.toString());
+    } else if (value instanceof char[]) {
+      write((char[])value);
+    } else {
+      throw new IllegalArgumentException("unsupported type: " + value.getClass());
+    }
   }
 
   /** Ensures that value is quoted when needed. */
