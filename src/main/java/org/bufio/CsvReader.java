@@ -95,6 +95,66 @@ public class CsvReader implements Closeable {
     return getString(findColumn(columnLabel));
   }
 
+  /**
+   * @param columnIndex the first column is 1, the second is 2, ...
+   */
+  public byte getByte(int columnIndex) throws IOException {
+    return Byte.parseByte(getString(columnIndex));
+  }
+  public byte getByte(String columnLabel) throws IOException {
+    return getByte(findColumn(columnLabel));
+  }
+
+  /**
+   * @param columnIndex the first column is 1, the second is 2, ...
+   */
+  public short getShort(int columnIndex) throws IOException {
+    return Short.parseShort(getString(columnIndex));
+  }
+  public short getShort(String columnLabel) throws IOException {
+    return getShort(findColumn(columnLabel));
+  }
+
+  /**
+   * @param columnIndex the first column is 1, the second is 2, ...
+   */
+  public int getInt(int columnIndex) throws IOException {
+    return Integer.parseInt(getString(columnIndex));
+  }
+  public int getInt(String columnLabel) throws IOException {
+    return getInt(findColumn(columnLabel));
+  }
+
+  /**
+   * @param columnIndex the first column is 1, the second is 2, ...
+   */
+  public long getLong(int columnIndex) throws IOException {
+    return Long.parseLong(getString(columnIndex));
+  }
+  public long getLong(String columnLabel) throws IOException {
+    return getLong(findColumn(columnLabel));
+  }
+
+  /**
+   * @param columnIndex the first column is 1, the second is 2, ...
+   */
+  public float getFloat(int columnIndex) throws IOException {
+    return Float.parseFloat(getString(columnIndex));
+  }
+  public float getFloat(String columnLabel) throws IOException {
+    return getFloat(findColumn(columnLabel));
+  }
+
+  /**
+   * @param columnIndex the first column is 1, the second is 2, ...
+   */
+  public double getDouble(int columnIndex) throws IOException {
+    return Double.parseDouble(getString(columnIndex));
+  }
+  public double getDouble(String columnLabel) throws IOException {
+    return getDouble(findColumn(columnLabel));
+  }
+
   public int findColumn(String columnLabel) throws IOException {
     if (columnIndexes == null || columnIndexes.isEmpty()) {
       throw new ScanException("No header");
