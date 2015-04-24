@@ -183,8 +183,10 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
   /**
    * Sets the character marking the start of a line comment. When specified (not 0), line comment appears as empty line.
    */
-  public void setCommentMarker(char comment) {
+  public char setCommentMarker(char comment) {
+    final char pcm = this.comment;
     this.comment = comment;
+    return pcm;
   }
 
   /**

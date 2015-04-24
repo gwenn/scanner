@@ -76,4 +76,37 @@ public class CsvScanner extends AbstractCsvScanner<String> {
   public String value() {
     return token();
   }
+
+  /** Reads text until next separator or eol/eof. */
+  public String scanText() throws IOException {
+    if (scan()) {
+      return value();
+    }
+    return null;
+  }
+  /** Reads double until next separator or eol/eof. */
+  public double scanDouble() throws IOException, IllegalArgumentException {
+    return Double.parseDouble(scanText());
+  }
+  /** Reads float until next separator or eol/eof. */
+  public float scanFloat() throws IOException, IllegalArgumentException {
+    return Float.parseFloat(scanText());
+  }
+  /** Reads int until next separator or eol/eof. */
+  public int scanInt() throws IOException, IllegalArgumentException {
+    return Integer.parseInt(scanText());
+  }
+
+  /** Read bool until next separator or eol/eof. */
+  public boolean scanBool(String trueValue) throws IOException {
+    return trueValue.equals(scanText());
+  }
+  /** Read char until next separator or eol/eof. */
+  public char scanChar() throws IOException, IllegalArgumentException {
+    final String text = scanText();
+    if (text.length() == 1) {
+      return text.charAt(0);
+    }
+    throw new IllegalArgumentException(String.format("expected character but got '%s'", text));
+  }
 }

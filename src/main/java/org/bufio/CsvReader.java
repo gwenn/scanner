@@ -13,6 +13,9 @@ public class CsvReader implements Closeable {
   private int n; // number of field in current row
   private Map<String, Integer> columnIndexes;
 
+  private boolean emptyIsNull;
+  private Boolean wasNull;
+
   /**
    * Creates a "standard" CSV reader (separator is comma and quoted mode active)
    */
@@ -42,9 +45,18 @@ public class CsvReader implements Closeable {
     this.columnIndexes = columnIndexes;
   }
 
-  public void scanHeaders() throws IOException {
-    // TODO ignore comment marker
-    scanRow();
+  public void scanHeaders(boolean ignoreCommentMarker) throws IOException {
+    char pcm = '\0';
+    if (ignoreCommentMarker) {
+      pcm = impl.setCommentMarker('\0');
+    }
+    try {
+      scanRow();
+    } finally {
+      if (ignoreCommentMarker) {
+        impl.setCommentMarker(pcm);
+      }
+    }
     if (n == 0) {
       return;
     }
@@ -70,6 +82,7 @@ public class CsvReader implements Closeable {
         break;
       }
     }
+    wasNull = null;
   }
 
   public String[] values() {
@@ -89,7 +102,14 @@ public class CsvReader implements Closeable {
     if (columnIndex > n) {
       throw new ScanException(String.format("Index out of bound (%d > %d)", columnIndex, n));
     }
-    return row[columnIndex-1];
+    final String value = row[columnIndex - 1];
+    if (emptyIsNull) {
+      wasNull = value.isEmpty();
+      if (wasNull) {
+        return null;
+      }
+    }
+    return value;
   }
   public String getString(String columnLabel) throws IOException {
     return getString(findColumn(columnLabel));
@@ -99,7 +119,11 @@ public class CsvReader implements Closeable {
    * @param columnIndex the first column is 1, the second is 2, ...
    */
   public byte getByte(int columnIndex) throws IOException {
-    return Byte.parseByte(getString(columnIndex));
+    final String value = getString(columnIndex);
+    if (emptyIsNull && wasNull) {
+      return 0;
+    }
+    return Byte.parseByte(value);
   }
   public byte getByte(String columnLabel) throws IOException {
     return getByte(findColumn(columnLabel));
@@ -109,7 +133,11 @@ public class CsvReader implements Closeable {
    * @param columnIndex the first column is 1, the second is 2, ...
    */
   public short getShort(int columnIndex) throws IOException {
-    return Short.parseShort(getString(columnIndex));
+    final String value = getString(columnIndex);
+    if (emptyIsNull && wasNull) {
+      return 0;
+    }
+    return Short.parseShort(value);
   }
   public short getShort(String columnLabel) throws IOException {
     return getShort(findColumn(columnLabel));
@@ -119,7 +147,11 @@ public class CsvReader implements Closeable {
    * @param columnIndex the first column is 1, the second is 2, ...
    */
   public int getInt(int columnIndex) throws IOException {
-    return Integer.parseInt(getString(columnIndex));
+    final String value = getString(columnIndex);
+    if (emptyIsNull && wasNull) {
+      return 0;
+    }
+    return Integer.parseInt(value);
   }
   public int getInt(String columnLabel) throws IOException {
     return getInt(findColumn(columnLabel));
@@ -129,7 +161,11 @@ public class CsvReader implements Closeable {
    * @param columnIndex the first column is 1, the second is 2, ...
    */
   public long getLong(int columnIndex) throws IOException {
-    return Long.parseLong(getString(columnIndex));
+    final String value = getString(columnIndex);
+    if (emptyIsNull && wasNull) {
+      return 0;
+    }
+    return Long.parseLong(value);
   }
   public long getLong(String columnLabel) throws IOException {
     return getLong(findColumn(columnLabel));
@@ -139,7 +175,11 @@ public class CsvReader implements Closeable {
    * @param columnIndex the first column is 1, the second is 2, ...
    */
   public float getFloat(int columnIndex) throws IOException {
-    return Float.parseFloat(getString(columnIndex));
+    final String value = getString(columnIndex);
+    if (emptyIsNull && wasNull) {
+      return 0;
+    }
+    return Float.parseFloat(value);
   }
   public float getFloat(String columnLabel) throws IOException {
     return getFloat(findColumn(columnLabel));
@@ -149,7 +189,11 @@ public class CsvReader implements Closeable {
    * @param columnIndex the first column is 1, the second is 2, ...
    */
   public double getDouble(int columnIndex) throws IOException {
-    return Double.parseDouble(getString(columnIndex));
+    final String value = getString(columnIndex);
+    if (emptyIsNull && wasNull) {
+      return 0;
+    }
+    return Double.parseDouble(value);
   }
   public double getDouble(String columnLabel) throws IOException {
     return getDouble(findColumn(columnLabel));
@@ -215,6 +259,15 @@ public class CsvReader implements Closeable {
 
   public void setSkipEmptyLines(boolean skipEmptyLines) {
     impl.setSkipEmptyLines(skipEmptyLines);
+  }
+
+  /** Treats empty value as `null` value */
+  public void setEmptyIsNull(boolean emptyIsNull) {
+    this.emptyIsNull = emptyIsNull;
+  }
+  /** Reports whether the last column read had an empty value. */
+  public boolean wasNull() {
+    return wasNull;
   }
 
   @Override
