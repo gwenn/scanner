@@ -43,8 +43,8 @@ public class CsvRreaderTest {
         if (t.error != null) {
           if (!e.getMessage().contains(t.error)) {
             fail(String.format("%s: error '%s', want error '%s'", t.name, e, t.error));
-          } else if (t.line != 0 && t.line != r.lineno()) {
-            fail(String.format("%s: error at %d expected %d:%d", t.name, r.lineno(), t.line, t.column));
+          } else if (t.line != 0 && t.line != r.getRow()) {
+            fail(String.format("%s: error at %d expected %d:%d", t.name, r.getRow(), t.line, t.column));
           }
         } else {
           fail(String.format("%s: unexpected error '%s'", t.name, e));
