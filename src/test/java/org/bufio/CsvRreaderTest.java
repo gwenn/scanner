@@ -12,7 +12,7 @@ public class CsvRreaderTest {
   @Test
   public void test() throws IOException {
     CsvReader r;
-    for (TestCase t : TestCase.tests) {
+    for (ReadTest t : ReadTest.tests) {
       r = new CsvReader(new StringReader(t.input), t.sep, t.quoted);
       r.setCommentMarker(t.comment);
       r.setTrim(t.trim);

@@ -96,6 +96,10 @@ public class CsvScanner extends AbstractCsvScanner<String> {
   public int scanInt() throws IOException, IllegalArgumentException {
     return Integer.parseInt(scanText());
   }
+  /** Reads long until next separator or eol/eof. */
+  public long scanLong() throws IOException, IllegalArgumentException {
+    return Long.parseLong(scanText());
+  }
 
   /** Read bool until next separator or eol/eof. */
   public boolean scanBool(String trueValue) throws IOException {

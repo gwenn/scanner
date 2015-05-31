@@ -7,6 +7,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * <pre>{@code
+ *     CsvReader r;
+ *     while (r.next()) {
+ *       String value1 = r.getString(1);
+ *       // ...
+ *     }
+ * }</pre>
+ */
 public class CsvReader implements Closeable {
   private final CsvScanner impl;
   private String[] row = new String[10]; // row

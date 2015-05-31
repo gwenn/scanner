@@ -4,9 +4,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 import static org.junit.Assert.fail;
@@ -15,7 +13,7 @@ public class CsvScannerTest {
   @Test
   public void testScan() throws IOException {
     CsvScanner r;
-    for (TestCase t : TestCase.tests) {
+    for (ReadTest t : ReadTest.tests) {
       r = new CsvScanner(new StringReader(t.input), t.sep, t.quoted);
       r.setCommentMarker(t.comment);
       r.setTrim(t.trim);
@@ -64,7 +62,7 @@ public class CsvScannerTest {
   @Test
   public void testScanRow() throws IOException {
     CsvScanner r;
-    for (TestCase t : TestCase.tests) {
+    for (ReadTest t : ReadTest.tests) {
       r = new CsvScanner(new StringReader(t.input), t.sep, t.quoted);
       r.setCommentMarker(t.comment);
       r.setTrim(t.trim);

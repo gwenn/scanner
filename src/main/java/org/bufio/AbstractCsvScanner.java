@@ -190,7 +190,7 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
   }
 
   /**
-   * Trims spaces (only on not-quoted values). Break rfc4180 rule: "Spaces are considered part of a field and should not be ignored."
+   * Trims spaces (only on not-quoted fields). Break rfc4180 rule: "Spaces are considered part of a field and should not be ignored."
    */
   public void setTrim(boolean trim) {
     this.trim = trim;

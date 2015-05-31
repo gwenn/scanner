@@ -13,6 +13,14 @@ import java.sql.SQLException;
  * (compatible with rfc4180 and extended with the option of having a separator other than ",").
  * Successive calls to the `write` method will automatically insert the separator.
  * The `endOfRow` method tells when a line break is inserted.
+ * <pre>{@code
+ *     CsvWriter w;
+ *     CsvReader r;
+ *     while (r.next()) {
+ *       w.writeRow(r.values());
+ *     }
+ *     w.flush();
+ * }</pre>
  */
 public class CsvWriter implements Closeable, Flushable {
   private final Writer w;
