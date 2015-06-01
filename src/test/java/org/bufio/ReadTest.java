@@ -1,5 +1,6 @@
 package org.bufio;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +18,14 @@ class ReadTest {
 	String error;
 	int line; // expected error line if != 0
 	int column;
+
+	CsvReader createReader() {
+		CsvReader r = new CsvReader(new StringReader(input), sep, quoted);
+		r.setCommentMarker(comment);
+		r.setTrim(trim);
+		r.setSkipEmptyLines(skipEmptyLines);
+		return r;
+	}
 
 	private ReadTest(String name, String input, String[][] output) {
 		this.name = name;

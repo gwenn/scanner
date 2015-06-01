@@ -84,7 +84,7 @@ public class CsvReader implements Closeable {
 	private void scanRow() throws IOException {
 		for (n = 0; impl.scan(); n++) {
 			if (n == row.length) {
-				row = Arrays.copyOf(row, n * 2);
+				row = Arrays.copyOf(row, n * 2); // FIXME limit
 			}
 			row[n] = impl.token();
 			if (impl.atEndOfRow()) {

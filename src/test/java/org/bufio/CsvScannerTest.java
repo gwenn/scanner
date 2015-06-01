@@ -2,6 +2,7 @@ package org.bufio;
 
 import org.junit.Test;
 
+import java.io.CharArrayReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
@@ -125,6 +126,42 @@ public class CsvScannerTest {
 		assertNull(r.scanText()); // eof
 		r.close();
 	}
+
+	@Test
+	public void testNullReader() {
+		try {
+			new CsvScanner(null);
+			fail();
+		} catch (IllegalArgumentException e) {
+			assertEquals("null reader", e.getMessage());
+		}
+	}
+
+	@Test
+	public void testLargeBuffer() throws IOException {
+		char[] chars = new char[4096 + 1024];
+		Arrays.fill(chars, 'c');
+		chars[4200] = ',';
+		final CsvScanner r = new CsvScanner(new CharArrayReader(chars));
+		assertTrue(r.scan());
+		assertEquals(4200, r.value().length());
+		assertTrue(r.scan());
+		assertEquals(919, r.value().length());
+		assertFalse(r.scan());
+		r.close();
+	}
+
+	@Test
+	public void testPeek() throws IOException {
+		CsvScanner r = new CsvScanner(new StringReader("a,b,c,d,e"));
+		char[] peeks = new char[]{'b', 'c', 'd', 'e', '\0'};
+		int i = 0;
+		while (r.scan()) {
+			final char c = r.peek();
+			assertEquals(peeks[i], c);
+			i++;
+		}
+		r.close();
+	}
 	// TODO scanRow with values = 0, 1, ...
-	// TODO skipRow "colA,colB\n# comment...\nvalue11,value12\n# comment...\nvalue21,value22"
 }

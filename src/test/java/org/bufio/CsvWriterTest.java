@@ -10,14 +10,9 @@ import static org.junit.Assert.fail;
 public class CsvWriterTest {
 	@Test
 	public void testWriteRow() throws IOException {
-		CsvWriter w;
 		for (WriteTest t : WriteTest.tests) {
 			final StringWriter s = new StringWriter();
-			w = new CsvWriter(s, t.sep, t.quoted);
-			w.setCommentMarker(t.comment);
-			if (t.useCRLF) {
-				w.useCRLF();
-			}
+			CsvWriter w = t.createWriter(s);
 			try {
 				for (String[] row : t.input) {
 					w.writeRow(row);
@@ -45,18 +40,13 @@ public class CsvWriterTest {
 
 	@Test
 	public void testWriteValue() throws IOException {
-		CsvWriter w;
 		for (WriteTest t : WriteTest.tests) {
 			final StringWriter s = new StringWriter();
-			w = new CsvWriter(s, t.sep, t.quoted);
-			w.setCommentMarker(t.comment);
-			if (t.useCRLF) {
-				w.useCRLF();
-			}
+			CsvWriter w = t.createWriter(s);
 			try {
 				for (String[] row : t.input) {
 					for (String v : row) {
-						w.writeValue(v);
+						w.writeValue(v); // FIXME create specific tests...
 					}
 					w.endOfRow();
 				}

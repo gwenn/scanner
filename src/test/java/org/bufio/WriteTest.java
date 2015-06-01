@@ -1,5 +1,6 @@
 package org.bufio;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,15 @@ class WriteTest {
 	boolean useCRLF;
 	char comment;
 	String error;
+
+	CsvWriter createWriter(StringWriter s) {
+		CsvWriter w = new CsvWriter(s, sep, quoted);
+		w.setCommentMarker(comment);
+		if (useCRLF) {
+			w.useCRLF();
+		}
+		return w;
+	}
 
 	private WriteTest(String name, String[][] input, String output) {
 		this.name = name;

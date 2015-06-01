@@ -70,7 +70,7 @@ public abstract class Scanner<T> implements Closeable {
 			if (buf.length >= maxTokenSize) {
 				throw new ScanException("token too long");
 			}
-			int newSize = Math.max(buf.length * 2, maxTokenSize);
+			int newSize = Math.min(buf.length * 2, maxTokenSize);
 			char[] newBuf = new char[newSize];
 			System.arraycopy(buf, start, newBuf, 0, end - start);
 			buf = newBuf;
