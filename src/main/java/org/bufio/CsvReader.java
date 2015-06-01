@@ -51,7 +51,7 @@ public class CsvReader implements Closeable {
         throw new IllegalArgumentException(String.format("Invalid index for '%s': %d < 1", entry.getKey(), entry.getValue()));
       }
     }
-    this.columnIndexes = columnIndexes;
+    this.columnIndexes = columnIndexes; // TODO clone/copy
   }
 
   public void scanHeaders(boolean ignoreCommentMarker) throws IOException {
@@ -246,7 +246,7 @@ public class CsvReader implements Closeable {
    * Returns current line number.
    * @see java.sql.ResultSet#getRow
    */
-  public int getRow() {
+  public int getRow() { // FIXME row versus lineno
     return impl.lineno();
   }
   /** @see java.sql.ResultSetMetaData#getColumnCount() */
@@ -255,19 +255,22 @@ public class CsvReader implements Closeable {
   }
 
   /**
-   * @param column the first column is 1, the second is 2, ...
+   * @param columnIndex the first column is 1, the second is 2, ...
    * @see java.sql.ResultSetMetaData#getColumnLabel(int)
    */
-  public String getColumnLabel(int column) throws ScanException {
+  public String getColumnLabel(int columnIndex) throws ScanException {
     if (columnIndexes == null || columnIndexes.isEmpty()) {
       throw new ScanException("No header");
     }
+    if (columnIndex < 1) {
+      throw new ScanException(String.format("Index out of bound (%d < 1)", columnIndex));
+    }
     for (Map.Entry<String, Integer> entry : columnIndexes.entrySet()) {
-      if (entry.getValue() == column) {
+      if (entry.getValue() == columnIndex) {
         return entry.getKey();
       }
     }
-    throw new ScanException(String.format("No such column '%d' in %s", column, columnIndexes));
+    throw new ScanException(String.format("No such index %d in %s", columnIndex, columnIndexes));
   }
 
   /**
@@ -297,7 +300,7 @@ public class CsvReader implements Closeable {
    * @see java.sql.ResultSet#wasNull
    */
   public boolean wasNull() {
-    return wasNull;
+    return emptyIsNull ? wasNull : false;
   }
 
   @Override

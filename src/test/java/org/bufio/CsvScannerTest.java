@@ -5,9 +5,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
-import java.util.Objects;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class CsvScannerTest {
   @Test
@@ -27,7 +26,7 @@ public class CsvScannerTest {
           } else if (j >= t.output[i].length) {
             fail(String.format("%s: unexpected number of column %d; want %d at line %d", t.name, j + 1, t.output[i].length, i + 1));
           }
-          if (!Objects.equals(r.token(), t.output[i][j])) {
+          if (!t.output[i][j].equals(r.token())) {
             fail(String.format("%s: unexpected value '%s'; want '%s' at line %d, column %d", t.name, r.token(), t.output[i][j], i + 1, j + 1));
           }
           if (r.atEndOfRow()) {
@@ -106,6 +105,26 @@ public class CsvScannerTest {
     }
   }
 
+  @Test
+  public void testScanObject() throws IOException {
+    Object[] values = {"text", Math.PI, Math.PI, Integer.MAX_VALUE, Long.MAX_VALUE, true, 'c'};
+    StringBuilder buffer = new StringBuilder();
+    for (Object value : values) {
+      buffer.append(String.valueOf(value));
+      buffer.append(',');
+    }
+    CsvScanner r = new CsvScanner(new StringReader(buffer.toString()));
+    assertEquals(values[0], r.scanText());
+    assertEquals(((Number)values[1]).floatValue(), r.scanFloat(), 1e-6);
+    assertEquals(((Number)values[2]).doubleValue(), r.scanDouble(), 1e-9);
+    assertEquals(((Number)values[3]).intValue(), r.scanInt());
+    assertEquals(((Number)values[4]).longValue(), r.scanLong());
+    assertEquals(values[5], r.scanBool("true"));
+    assertEquals(values[6], r.scanChar());
+    assertEquals("", r.scanText()); // extra ',' during join...
+    assertNull(r.scanText()); // eof
+    r.close();
+  }
   // TODO scanRow with values = 0, 1, ...
   // TODO skipRow "colA,colB\n# comment...\nvalue11,value12\n# comment...\nvalue21,value22"
 }
