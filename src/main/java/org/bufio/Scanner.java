@@ -9,7 +9,7 @@ import java.io.Reader;
  */
 public abstract class Scanner<T> implements Closeable {
 	// The reader provided by the client.
-	private final Reader r;
+	private /*final*/ Reader r;
 	// Maximum size of a token
 	private final int maxTokenSize;
 	// Last token returned by split.
@@ -24,12 +24,20 @@ public abstract class Scanner<T> implements Closeable {
 	private boolean eof;
 
 	protected Scanner(Reader r) {
+		reset(r);
+		maxTokenSize = 64 * 1024;
+		buf = new char[4096]; // Plausible starting size; needn't be large.
+	}
+
+	/** Reuse this scanner with a new content. */
+	protected void reset(Reader r) {
 		if (r == null) {
 			throw new IllegalArgumentException("null reader");
 		}
 		this.r = r;
-		maxTokenSize = 64 * 1024;
-		buf = new char[4096]; // Plausible starting size; needn't be large.
+		token = null;
+		start = 0; end = 0;
+		eof = false;
 	}
 
 	public boolean scan() throws IOException {

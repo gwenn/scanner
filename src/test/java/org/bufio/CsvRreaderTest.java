@@ -18,11 +18,14 @@ public class CsvRreaderTest {
 		for (ReadTest t : ReadTest.tests) {
 			r = t.createReader();
 
-			check(t, r);
+			check(t, r, false);
+
+			r.reset(new StringReader(t.input));
+			check(t, r, true);
 		}
 	}
 
-	static void check(ReadTest t, CsvReader r) throws IOException {
+	static void check(ReadTest t, CsvReader r, boolean close) throws IOException {
 		int i = 0;
 		try {
 			while (r.next()) {
@@ -55,7 +58,9 @@ public class CsvRreaderTest {
 				fail(String.format("%s: unexpected error '%s'", t.name, e));
 			}
 		} finally {
-			r.close();
+			if (close) {
+				r.close();
+			}
 		}
 	}
 

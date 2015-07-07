@@ -38,7 +38,7 @@ public class RoundTripTest {
 				//r.setCommentMarker(t.comment); comments already skipped (or not)
 				//r.setTrim(t.trim); values already trimmed (or not)
 				r.setSkipEmptyLines(t.skipEmptyLines);
-				CsvRreaderTest.check(t, r);
+				CsvRreaderTest.check(t, r, true);
 			}
 		}
 	}
@@ -94,7 +94,7 @@ test:
 				//r.setCommentMarker(t.comment); comments already skipped (or not)
 				//r.setTrim(t.trim); values already trimmed (or not)
 				r.setSkipEmptyLines(t.skipEmptyLines);
-				CsvRreaderTest.check(t, r);
+				CsvRreaderTest.check(t, r, true);
 			}
 		}
 	}

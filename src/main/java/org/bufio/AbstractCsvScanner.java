@@ -32,11 +32,17 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
 
 	protected AbstractCsvScanner(Reader r, char sep, boolean quoted) {
 		super(r);
-		lineno = 1;
-		eor = true;
 		this.sep = sep;
 		this.quoted = quoted;
 		skipEmptyLines = true;
+	}
+
+	@Override
+	public void reset(Reader r) {
+		super.reset(r);
+		lineno = 1;
+		eor = true;
+		column = 0;
 	}
 
 	protected abstract T newToken(char[] data, int start, int end);

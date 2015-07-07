@@ -40,6 +40,14 @@ public class CsvReader implements Closeable {
 		impl = new CsvScanner(r, sep, quoted);
 	}
 
+	/** Reuse this component with a new content. */
+	public void reset(Reader r) {
+		impl.reset(r);
+		n = 0;
+		columnIndexes = null; // TODO validate
+		wasNull = null;
+	}
+
 	/**
 	 * The first column is 1, the second is 2, ...
 	 */
