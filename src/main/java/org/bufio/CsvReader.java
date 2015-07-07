@@ -9,11 +9,11 @@ import java.util.Map;
 
 /**
  * <pre>{@code
- *     CsvReader r;
- *     while (r.next()) {
- *       String value1 = r.getString(1);
- *       // ...
- *     }
+ * CsvReader r;
+ * while (r.next()) {
+ *   String value1 = r.getString(1);
+ *   // ...
+ * }
  * }</pre>
  */
 public class CsvReader implements Closeable {

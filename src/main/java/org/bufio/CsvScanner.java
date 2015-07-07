@@ -9,14 +9,14 @@ import java.io.Reader;
  * Successive calls to the `scan` method will step through the 'fields', skipping the separator/newline between the fields.
  * The `atEndOfRow` method tells when a field is terminated by a line break.
  * <pre>{@code
- *     CsvScanner s;
- *     while (s.scan())) {
- *       String value = s.value();
- *       // ...
- *       if (s.atEndOfRow()) {
- *         // ...
- *       }
- *     }
+ * CsvScanner s;
+ * while (s.scan())) {
+ *   String value = s.value();
+ *   // ...
+ *   if (s.atEndOfRow()) {
+ *     // ...
+ *   }
+ * }
  * }</pre>
  */
 public class CsvScanner extends AbstractCsvScanner<String> {
@@ -48,13 +48,13 @@ public class CsvScanner extends AbstractCsvScanner<String> {
 	 * Returns the number of values read (see #column()).
 	 * At EOF, returns 0.
 	 * <pre>{@code
-	 *     CsvScanner s;
-	 *     String[] values = new String[20]; // max columns
-	 *     int n;
-	 *     while ((n = s.scanRow(values)) > 0) {
-	 *       String[] row = Arrays.copyOf(values, n);
-	 *       // ...
-	 *     }
+	 * CsvScanner s;
+	 * String[] values = new String[20]; // max columns
+	 * int n;
+	 * while ((n = s.scanRow(values)) > 0) {
+	 *   String[] row = Arrays.copyOf(values, n);
+	 *   // ...
+	 * }
 	 * }</pre>
 	 */
 	public int scanRow(String[] values) throws IOException {

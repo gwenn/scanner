@@ -14,12 +14,12 @@ import java.sql.SQLException;
  * Successive calls to the `write` method will automatically insert the separator.
  * The `endOfRow` method tells when a line break is inserted.
  * <pre>{@code
- *     CsvWriter w;
- *     CsvReader r;
- *     while (r.next()) {
- *       w.writeRow(r.values());
- *     }
- *     w.flush();
+ * CsvWriter w;
+ * CsvReader r;
+ * while (r.next()) {
+ *   w.writeRow(r.values());
+ * }
+ * w.flush();
  * }</pre>
  */
 public class CsvWriter implements Closeable, Flushable { // TODO round tripping test
