@@ -34,6 +34,7 @@ public class CsvWriter implements Closeable, Flushable { // TODO round tripping 
 	private boolean sor;
 	// character marking the start of a line comment.
 	private char comment;
+	private Marshaler marshaler;
 
 	private char[] buf;
 
@@ -104,7 +105,9 @@ public class CsvWriter implements Closeable, Flushable { // TODO round tripping 
 
 	// Value's type is used to encode value to text.
 	public void writeValue(Object value) throws IOException {
-		if (value == null) {
+		if (marshaler != null) {
+			write(marshaler.marshal(value));
+		} else if (value == null) {
 			write(buf, 0, 0);
 		} else if (value instanceof String) {
 			write((String) value);
@@ -196,6 +199,11 @@ public class CsvWriter implements Closeable, Flushable { // TODO round tripping 
 	/** Sets the character marking the start of a line comment. */
 	public void setCommentMarker(char comment) {
 		this.comment = comment;
+	}
+
+	/** Sets the component called by {@link #writeValue} to marshall value to text.  */
+	public void setMarshaler(Marshaler marshaler) {
+		this.marshaler = marshaler;
 	}
 
 	@Override

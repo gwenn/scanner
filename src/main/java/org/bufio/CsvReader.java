@@ -21,6 +21,7 @@ public class CsvReader implements Closeable {
 	private String[] row = new String[10]; // row
 	private int n; // number of field in current row
 	private Map<String, Integer> columnIndexes;
+	private Unmarshaler unmarshaler;
 
 	private boolean emptyIsNull;
 	private Boolean wasNull;
@@ -231,6 +232,21 @@ public class CsvReader implements Closeable {
 		return getDouble(findColumn(columnLabel));
 	}
 
+	/**
+	 * @param columnIndex the first column is 1, the second is 2, ...
+	 * @see java.sql.ResultSet#getObject(int, Class) */
+	public <T> T getObject(int columnIndex, Class<T> type) throws IOException {
+		if (unmarshaler == null) {
+			throw new IllegalStateException("No unmarshaler set");
+		}
+		return unmarshaler.unmarshal(getString(columnIndex), type);
+	}
+
+	/** @see java.sql.ResultSet#getObject(String, Class) */
+	public <T> T getObject(String columnLabel, Class<T> type) throws IOException {
+		return getObject(findColumn(columnLabel), type);
+	}
+
 	/** @see java.sql.ResultSet#findColumn(String) */
 	public int findColumn(String columnLabel) throws IOException {
 		if (columnIndexes == null || columnIndexes.isEmpty()) {
@@ -311,6 +327,10 @@ public class CsvReader implements Closeable {
 		return emptyIsNull ? wasNull : false;
 	}
 
+	/** Sets the component used by {@link #getObject} to transform text to object. */
+	public void setUnmarshaler(Unmarshaler unmarshaler) {
+		this.unmarshaler = unmarshaler;
+	}
 	@Override
 	public void close() throws IOException {
 		impl.close();
