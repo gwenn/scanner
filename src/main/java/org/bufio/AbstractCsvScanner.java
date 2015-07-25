@@ -38,7 +38,7 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
 	}
 
 	@Override
-	public void reset(Reader r) {
+	public final void reset(Reader r) {
 		super.reset(r);
 		lineno = 1;
 		eor = true;
@@ -92,7 +92,7 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
 			return newToken(data, start, end, false);
 		}
 		if (quoted && start < end && data[start] == '"') { // quoted field (may contains separator, newline and escaped quote)
-			int startLineno = lineno;
+			final int startLineno = lineno;
 			int escapedQuotes = 0;
 			char c = 0, pc = 0, ppc = 0;
 			// Scan until the separator or newline following the closing quote (and ignore escaped quote)

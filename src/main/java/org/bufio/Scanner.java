@@ -45,7 +45,7 @@ public abstract class Scanner<T> implements Closeable {
 		while (true) {
 			// See if we can get a token with what we already have.
 			if (end > start || eof) {
-				int pstart = start;
+				final int pstart = start;
 				token = split(buf, start, end, eof);
 				if (token != null) {
 					return true;

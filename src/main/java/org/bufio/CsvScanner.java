@@ -85,19 +85,19 @@ public class CsvScanner extends AbstractCsvScanner<String> {
 		return null;
 	}
 	/** Reads double until next separator or eol/eof. */
-	public double scanDouble() throws IOException, IllegalArgumentException {
+	public double scanDouble() throws IOException, NumberFormatException {
 		return Double.parseDouble(scanText());
 	}
 	/** Reads float until next separator or eol/eof. */
-	public float scanFloat() throws IOException, IllegalArgumentException {
+	public float scanFloat() throws IOException, NumberFormatException {
 		return Float.parseFloat(scanText());
 	}
 	/** Reads int until next separator or eol/eof. */
-	public int scanInt() throws IOException, IllegalArgumentException {
+	public int scanInt() throws IOException, NumberFormatException {
 		return Integer.parseInt(scanText());
 	}
 	/** Reads long until next separator or eol/eof. */
-	public long scanLong() throws IOException, IllegalArgumentException {
+	public long scanLong() throws IOException, NumberFormatException {
 		return Long.parseLong(scanText());
 	}
 

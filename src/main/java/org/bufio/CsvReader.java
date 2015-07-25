@@ -42,7 +42,7 @@ public class CsvReader implements Closeable {
 	}
 
 	/** Reuse this component with a new content. */
-	public void reset(Reader r) {
+	public final void reset(Reader r) {
 		impl.reset(r);
 		n = 0;
 		columnIndexes = null; // TODO validate
@@ -112,7 +112,7 @@ public class CsvReader implements Closeable {
 	 * @param columnIndex the first column is 1, the second is 2, ...
 	 * @see java.sql.ResultSet#getString(int)
 	 */
-	public String getString(int columnIndex) throws IOException {
+	public String getString(int columnIndex) throws ScanException {
 		if (n == 0) {
 			throw new ScanException("No row");
 		}
@@ -132,7 +132,7 @@ public class CsvReader implements Closeable {
 		return value;
 	}
 	/** @see java.sql.ResultSet#getString(String) */
-	public String getString(String columnLabel) throws IOException {
+	public String getString(String columnLabel) throws ScanException {
 		return getString(findColumn(columnLabel));
 	}
 
@@ -140,7 +140,7 @@ public class CsvReader implements Closeable {
 	 * @param columnIndex the first column is 1, the second is 2, ...
 	 * @see java.sql.ResultSet#getByte(int)
 	 */
-	public byte getByte(int columnIndex) throws IOException {
+	public byte getByte(int columnIndex) throws ScanException {
 		final String value = getString(columnIndex);
 		if (emptyIsNull && wasNull) {
 			return 0;
@@ -148,7 +148,7 @@ public class CsvReader implements Closeable {
 		return Byte.parseByte(value);
 	}
 	/** @see java.sql.ResultSet#getByte(String) */
-	public byte getByte(String columnLabel) throws IOException {
+	public byte getByte(String columnLabel) throws ScanException {
 		return getByte(findColumn(columnLabel));
 	}
 
@@ -156,7 +156,7 @@ public class CsvReader implements Closeable {
 	 * @param columnIndex the first column is 1, the second is 2, ...
 	 * @see java.sql.ResultSet#getShort(int)
 	 */
-	public short getShort(int columnIndex) throws IOException {
+	public short getShort(int columnIndex) throws ScanException {
 		final String value = getString(columnIndex);
 		if (emptyIsNull && wasNull) {
 			return 0;
@@ -164,7 +164,7 @@ public class CsvReader implements Closeable {
 		return Short.parseShort(value);
 	}
 	/** @see java.sql.ResultSet#getShort(String) */
-	public short getShort(String columnLabel) throws IOException {
+	public short getShort(String columnLabel) throws ScanException {
 		return getShort(findColumn(columnLabel));
 	}
 
@@ -172,7 +172,7 @@ public class CsvReader implements Closeable {
 	 * @param columnIndex the first column is 1, the second is 2, ...
 	 * @see java.sql.ResultSet#getInt(int)
 	 */
-	public int getInt(int columnIndex) throws IOException {
+	public int getInt(int columnIndex) throws ScanException {
 		final String value = getString(columnIndex);
 		if (emptyIsNull && wasNull) {
 			return 0;
@@ -180,7 +180,7 @@ public class CsvReader implements Closeable {
 		return Integer.parseInt(value);
 	}
 	/** @see java.sql.ResultSet#getInt(String) */
-	public int getInt(String columnLabel) throws IOException {
+	public int getInt(String columnLabel) throws ScanException {
 		return getInt(findColumn(columnLabel));
 	}
 
@@ -188,7 +188,7 @@ public class CsvReader implements Closeable {
 	 * @param columnIndex the first column is 1, the second is 2, ...
 	 * @see java.sql.ResultSet#getLong(int)
 	 */
-	public long getLong(int columnIndex) throws IOException {
+	public long getLong(int columnIndex) throws ScanException {
 		final String value = getString(columnIndex);
 		if (emptyIsNull && wasNull) {
 			return 0;
@@ -196,7 +196,7 @@ public class CsvReader implements Closeable {
 		return Long.parseLong(value);
 	}
 	/** @see java.sql.ResultSet#getLong(String) */
-	public long getLong(String columnLabel) throws IOException {
+	public long getLong(String columnLabel) throws ScanException  {
 		return getLong(findColumn(columnLabel));
 	}
 
@@ -204,7 +204,7 @@ public class CsvReader implements Closeable {
 	 * @param columnIndex the first column is 1, the second is 2, ...
 	 * @see java.sql.ResultSet#getFloat(int)
 	 */
-	public float getFloat(int columnIndex) throws IOException {
+	public float getFloat(int columnIndex) throws ScanException {
 		final String value = getString(columnIndex);
 		if (emptyIsNull && wasNull) {
 			return 0;
@@ -212,7 +212,7 @@ public class CsvReader implements Closeable {
 		return Float.parseFloat(value);
 	}
 	/** @see java.sql.ResultSet#getFloat(String) */
-	public float getFloat(String columnLabel) throws IOException {
+	public float getFloat(String columnLabel) throws ScanException {
 		return getFloat(findColumn(columnLabel));
 	}
 
@@ -220,7 +220,7 @@ public class CsvReader implements Closeable {
 	 * @param columnIndex the first column is 1, the second is 2, ...
 	 * @see java.sql.ResultSet#getDouble(int)
 	 */
-	public double getDouble(int columnIndex) throws IOException {
+	public double getDouble(int columnIndex) throws ScanException {
 		final String value = getString(columnIndex);
 		if (emptyIsNull && wasNull) {
 			return 0;
@@ -228,14 +228,14 @@ public class CsvReader implements Closeable {
 		return Double.parseDouble(value);
 	}
 	/** @see java.sql.ResultSet#getDouble(String) */
-	public double getDouble(String columnLabel) throws IOException {
+	public double getDouble(String columnLabel) throws ScanException {
 		return getDouble(findColumn(columnLabel));
 	}
 
 	/**
 	 * @param columnIndex the first column is 1, the second is 2, ...
 	 * @see java.sql.ResultSet#getObject(int, Class) */
-	public <T> T getObject(int columnIndex, Class<T> type) throws IOException {
+	public <T> T getObject(int columnIndex, Class<T> type) throws ScanException {
 		if (unmarshaler == null) {
 			throw new IllegalStateException("No unmarshaler set");
 		}
@@ -243,12 +243,12 @@ public class CsvReader implements Closeable {
 	}
 
 	/** @see java.sql.ResultSet#getObject(String, Class) */
-	public <T> T getObject(String columnLabel, Class<T> type) throws IOException {
+	public <T> T getObject(String columnLabel, Class<T> type) throws ScanException {
 		return getObject(findColumn(columnLabel), type);
 	}
 
 	/** @see java.sql.ResultSet#findColumn(String) */
-	public int findColumn(String columnLabel) throws IOException {
+	public int findColumn(String columnLabel) throws ScanException {
 		if (columnIndexes == null || columnIndexes.isEmpty()) {
 			throw new ScanException("No header");
 		}
