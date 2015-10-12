@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * <pre>{@code
@@ -16,7 +18,7 @@ import java.util.Map;
  * }
  * }</pre>
  */
-public class CsvReader implements Closeable {
+public class CsvReader implements Closeable, Iterable<String[]> {
 	private final CsvScanner impl;
 	private String[] row = new String[10]; // row
 	private int n; // number of field in current row
@@ -334,5 +336,51 @@ public class CsvReader implements Closeable {
 	@Override
 	public void close() throws IOException {
 		impl.close();
+	}
+
+	/** @throws IllegalStateException for IOException. */
+	@Override
+	public Iterator<String[]> iterator() {
+		return new Iterator<String[]>() {
+			private State state = State.NOT_READY;
+			@Override
+			public boolean hasNext() {
+				if (State.FAILED == state) {
+					throw new IllegalStateException();
+				}
+				if (State.DONE == state) {
+					return false;
+				} else if (State.READY == state) {
+					return true;
+				}
+				state = State.FAILED;
+				try {
+					if (CsvReader.this.next()) {
+						state = State.READY;
+						return true;
+					} else {
+						state = State.DONE;
+						return false;
+					}
+				} catch (IOException e) {
+					throw new IllegalStateException(e);
+				}
+			}
+			@Override
+			public String[] next() {
+				if (!hasNext()) {
+					throw new NoSuchElementException();
+				}
+				state = State.NOT_READY;
+				return CsvReader.this.values();
+			}
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+		};
+	}
+	private enum State {
+		READY, NOT_READY, DONE, FAILED,
 	}
 }
