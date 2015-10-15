@@ -22,6 +22,14 @@ class WriteTest {
 		}
 		return w;
 	}
+	CsvColWriter createColWriter(StringWriter s) {
+		CsvColWriter w = new CsvColWriter(s, sep, quoted);
+		w.setCommentMarker(comment);
+		if (useCRLF) {
+			w.useCRLF();
+		}
+		return w;
+	}
 
 	private WriteTest(String name, String[][] input, String output) {
 		this.name = name;

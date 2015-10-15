@@ -42,6 +42,35 @@ public class RoundTripTest {
 			}
 		}
 	}
+	@Test
+	public void testReadColWrite() throws IOException {
+		for (ReadTest t : ReadTest.tests) {
+			if (t.error != null) {
+				continue;
+			}
+			CsvReader r = t.createReader();
+			final StringWriter buf = new StringWriter();
+			CsvColWriter w = new CsvColWriter(buf, t.sep, t.quoted);
+			//w.setCommentMarker(t.comment);
+			//w.useCRLF();
+			while (r.next()) {
+				final String[] values = r.values();
+				for (int i = 1; i <= values.length; i++) {
+					w.setString(i, values[i-1]);
+				}
+				w.endOfRow();
+			}
+			r.close();
+			w.close();
+			if (!t.input.equals(buf.toString())) {
+				r = new CsvReader(new StringReader(buf.toString()), t.sep, t.quoted);
+				//r.setCommentMarker(t.comment); comments already skipped (or not)
+				//r.setTrim(t.trim); values already trimmed (or not)
+				r.setSkipEmptyLines(t.skipEmptyLines);
+				CsvRreaderTest.check(t, r, true);
+			}
+		}
+	}
 
 	@Test
 	public void testWriteRead() throws IOException {

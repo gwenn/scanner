@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -51,21 +52,11 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 		wasNull = null;
 	}
 
-	/**
-	 * The first column is 1, the second is 2, ...
-	 */
-	public void withColumnIndexes(Map<String, Integer> columnIndexes) {
-		for (Map.Entry<String, Integer> entry : columnIndexes.entrySet()) {
-			if (entry.getValue() == null) {
-				throw new IllegalArgumentException(String.format("Null index for '%s'", entry.getKey()));
-			} else if (entry.getValue() < 1) {
-				throw new IllegalArgumentException(String.format("Invalid index for '%s': %d < 1", entry.getKey(), entry.getValue()));
-			}
-		}
-		this.columnIndexes = columnIndexes; // TODO clone/copy
+	public void withHeaders(Iterable<String> headers) {
+		columnIndexes = toColumnIndexes(headers);
 	}
 
-	public void scanHeaders(boolean ignoreCommentMarker) throws IOException {
+	public Map<String,Integer> scanHeaders(boolean ignoreCommentMarker) throws IOException {
 		char pcm = '\0';
 		if (ignoreCommentMarker) {
 			pcm = impl.setCommentMarker('\0');
@@ -78,12 +69,13 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 			}
 		}
 		if (n == 0) {
-			return;
+			return Collections.emptyMap();
 		}
 		columnIndexes = new HashMap<String, Integer>(n);
 		for (int j = 0; j < n; j++) {
 			columnIndexes.put(row[j], j + 1);
 		}
+		return columnIndexes; // TODO clone/copy
 	}
 
 	/** @see java.sql.ResultSet#next */
@@ -382,5 +374,14 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 	}
 	private enum State {
 		READY, NOT_READY, DONE, FAILED,
+	}
+
+	static Map<String, Integer> toColumnIndexes(Iterable<String> headers) {
+		final Map<String, Integer> columnIndexes = new HashMap<String, Integer>();
+		int i = 1;
+		for (String header : headers) {
+			columnIndexes.put(header, i++);
+		}
+		return columnIndexes;
 	}
 }

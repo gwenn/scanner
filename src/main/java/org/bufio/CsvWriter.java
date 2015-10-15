@@ -9,7 +9,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 /**
- * CsvPrinter provides an interface for writing CSV data.
+ * CsvWriter provides an interface for writing CSV data.
  * (compatible with rfc4180 and extended with the option of having a separator other than ",").
  * Successive calls to the `write` method will automatically insert the separator.
  * The `endOfRow` method tells when a line break is inserted.
@@ -116,7 +116,8 @@ public class CsvWriter implements Closeable, Flushable { // TODO round tripping 
 		} else if (value instanceof Boolean) {
 			write(value.toString()); // TODO parameterizable ("true"|"false")
 		} else if (value instanceof Character) {
-			write(value.toString());
+			buf[0] = (Character)value;
+			write(buf, 0, 1);
 		} else if (value instanceof char[]) {
 			write((char[]) value);
 		} else {
