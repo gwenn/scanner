@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.Reader;
 
 /**
- * Provides an interface for reading CSV data
+ * Provides an interface for reading CSV data by field
  * (compatible with rfc4180 and extended with the option of having a separator other than ",").
  * Successive calls to the `scan` method will step through the 'fields', skipping the separator/newline between the fields.
  * The `atEndOfRow` method tells when a field is terminated by a line break.

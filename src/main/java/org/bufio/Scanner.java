@@ -40,6 +40,10 @@ public abstract class Scanner<T> implements Closeable {
 		eof = false;
 	}
 
+	/** Advances the Scanner to the next token, which will then be
+	 * available through the {@link #token} method.
+	 * @return false when the scan stops, by reaching the end of the input.
+	 */
 	public boolean scan() throws IOException {
 		// Loop until we have a token.
 		while (true) {
@@ -98,6 +102,7 @@ public abstract class Scanner<T> implements Closeable {
 	/** The function to split the tokens. */
 	protected abstract T split(char[] data, int start, int end, boolean atEOF) throws ScanException;
 
+	/** @return The token returned by {@link #split} function */
 	protected T token() {
 		return token;
 	}
@@ -119,6 +124,9 @@ public abstract class Scanner<T> implements Closeable {
 		r.close();
 	}
 
+	/** Used by {@link #split} function to advance the input.
+	 * @param n the number of bytes.
+	 */
 	protected void advance(int n) throws ScanException {
 		if (n < 0) {
 			throw new ScanException("SplitFunc returns negative advance count");
@@ -129,6 +137,7 @@ public abstract class Scanner<T> implements Closeable {
 		start = n;
 	}
 
+	/** @return Position of the first non-processed byte in buffer. */
 	protected int position() {
 		return start;
 	}

@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
+ * Provides an interface for reading CSV data by row
+ * (compatible with rfc4180 and extended with the option of having a separator other than ",").
  * <pre>{@code
  * CsvReader r;
  * while (r.next()) {
@@ -190,7 +192,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 		return Long.parseLong(value);
 	}
 	/** @see java.sql.ResultSet#getLong(String) */
-	public long getLong(String columnLabel) throws ScanException  {
+	public long getLong(String columnLabel) throws ScanException {
 		return getLong(findColumn(columnLabel));
 	}
 

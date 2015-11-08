@@ -9,7 +9,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 /**
- * CsvWriter provides an interface for writing CSV data.
+ * CsvWriter provides an interface for writing CSV data in accordance with the columns order
  * (compatible with rfc4180 and extended with the option of having a separator other than ",").
  * Successive calls to the `write` method will automatically insert the separator.
  * The `endOfRow` method tells when a line break is inserted.
@@ -22,7 +22,7 @@ import java.sql.SQLException;
  * w.flush();
  * }</pre>
  */
-public class CsvWriter implements Closeable, Flushable { // TODO round tripping test
+public class CsvWriter implements Closeable, Flushable {
 	private final Writer w;
 	// values separator
 	private final char sep;
@@ -184,7 +184,20 @@ public class CsvWriter implements Closeable, Flushable { // TODO round tripping 
 		sor = false;
 	}
 
-	/** Tells when a line break must be inserted. */
+	/** Tells when a line break must be inserted.
+	 * <pre>{@code
+	 * CsvWriter w;
+	 * CsvScanner s;
+	 * while (s.scan())) {
+	 *   String value = s.value();
+	 *   w.write(value);
+	 *   if (s.atEndOfRow()) {
+	 *     w.endOfRow();
+	 *   }
+	 * }
+	 * w.flush();
+	 * }</pre>
+	 */
 	public void endOfRow() throws IOException {
 		if (useCRLF) {
 			w.write('\r');
@@ -202,7 +215,7 @@ public class CsvWriter implements Closeable, Flushable { // TODO round tripping 
 		this.comment = comment;
 	}
 
-	/** Sets the component called by {@link #writeValue} to marshall value to text.  */
+	/** Sets the component called by {@link #writeValue} to marshall value to text. */
 	public void setMarshaler(Marshaler marshaler) {
 		this.marshaler = marshaler;
 	}

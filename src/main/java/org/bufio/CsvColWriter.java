@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * CsvColWriter provides an interface for writing CSV data.
+ * CsvColWriter provides an interface for writing CSV data by row
  * (compatible with rfc4180 and extended with the option of having a separator other than ",").
- * Successive calls to the `write` method will automatically insert the separator.
+ * Calls to the `setX` methods can be made in any order.
  * The `endOfRow` method tells when a line break is inserted.
  * <pre>{@code
  * CsvColWriter w;
@@ -24,6 +24,7 @@ import java.util.Map;
  *   w.setString(2, r.getString(1));
  *   w.setString(1, r.getString(2));
  *   ...
+ *   w.endOfRow();
  * }
  * w.flush();
  * }</pre>
@@ -200,7 +201,7 @@ public class CsvColWriter implements Closeable, Flushable {
 		writer.setCommentMarker(comment);
 	}
 
-	/** Sets the component called by {@link #setObject} to marshall value to text.  */
+	/** Sets the component called by {@link #setObject} to marshall value to text. */
 	public void setMarshaler(Marshaler marshaler) {
 		writer.setMarshaler(marshaler);
 	}
