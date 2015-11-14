@@ -35,6 +35,7 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
 		this.sep = sep;
 		this.quoted = quoted;
 		skipEmptyLines = true;
+		lineno = 1;
 	}
 
 	@Override
