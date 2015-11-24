@@ -332,7 +332,17 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 		impl.close();
 	}
 
-	/** @throws IllegalStateException for IOException. */
+	/**
+	 * Iterates on <i>rows</i>.
+	 * <pre>{@code
+	 * CsvReader r;
+	 * for (String[] row : r) {
+	 *   // ...
+	 * }
+	 * }</pre>
+	 * @return an iterator on <i>rows</i>.
+	 * @throws IllegalStateException for IOException.
+	 */
 	@Override
 	public Iterator<String[]> iterator() {
 		return new Iterator<String[]>() {

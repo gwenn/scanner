@@ -119,6 +119,10 @@ public abstract class Scanner<T> implements Closeable {
 		}
 	}
 
+	public boolean atEndOfFile() {
+		return eof;
+	}
+
 	@Override
 	public void close() throws IOException {
 		r.close();

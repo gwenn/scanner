@@ -2,6 +2,8 @@ package org.bufio;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Provides an interface for reading CSV data by field
@@ -19,7 +21,7 @@ import java.io.Reader;
  * }
  * }</pre>
  */
-public class CsvScanner extends AbstractCsvScanner<String> {
+public class CsvScanner extends AbstractCsvScanner<String> implements Iterable<String> {
 	/**
 	 * Creates a "standard" CSV reader (separator is comma and quoted mode active)
 	 */
@@ -112,5 +114,64 @@ public class CsvScanner extends AbstractCsvScanner<String> {
 			return text.charAt(0);
 		}
 		throw new IllegalArgumentException(String.format("expected character but got '%s'", text));
+	}
+
+	/**
+	 * Iterates on <i>fields</i>. Stops at the end of the line/record.
+	 * <pre>{@code
+	 * CsvScanner s;
+	 * while (!s.atEndOfFile())) {
+	 *   for (String field : s) {
+	 *     // ...
+	 *   }
+	 * }
+	 * }</pre>
+	 * @return an iterator on <i>fields</i>.
+	 * @throws IllegalStateException for IOException.
+	 */
+	@Override
+	public Iterator<String> iterator() {
+		return new Iterator<String>() {
+			private State state = State.NOT_READY;
+			@Override
+			public boolean hasNext() {
+				if (State.FAILED == state) {
+					throw new IllegalStateException();
+				}
+				if (State.DONE == state) {
+					return false;
+				} else if (State.READY == state) {
+					return true;
+				}
+
+				state = State.FAILED;
+				try {
+					if (CsvScanner.this.scan()) {
+						state = State.READY;
+						return true;
+					} else {
+						state = State.DONE;
+						return false;
+					}
+				} catch (IOException e) {
+					throw new IllegalStateException(e);
+				}
+			}
+			@Override
+			public String next() {
+				if (!hasNext()) {
+					throw new NoSuchElementException();
+				}
+				state = CsvScanner.this.atEndOfRow() ? State.DONE : State.NOT_READY;
+				return CsvScanner.this.token();
+			}
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+		};
+	}
+	private enum State {
+		READY, NOT_READY, DONE, FAILED,
 	}
 }

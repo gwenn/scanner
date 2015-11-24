@@ -107,6 +107,56 @@ public class CsvScannerTest {
 	}
 
 	@Test
+	public void testIterator() throws IOException {
+		CsvScanner r;
+		for (ReadTest t : ReadTest.tests) {
+			r = new CsvScanner(new StringReader(t.input), t.sep, t.quoted);
+			r.setCommentMarker(t.comment);
+			r.setTrim(t.trim);
+			r.setSkipEmptyLines(t.skipEmptyLines);
+
+			int i = 0, j = 0;
+			try {
+				while (!r.atEndOfFile()) {
+					for (String field : r) {
+						if (i >= t.output.length) {
+							fail(String.format("%s: unexpected number of row %d; want %d max", t.name, i + 1, t.output.length));
+						} else if (j >= t.output[i].length) {
+							fail(String.format("%s: unexpected number of column %d; want %d at line %d", t.name, j + 1, t.output[i].length, i + 1));
+						}
+						if (!t.output[i][j].equals(field)) {
+							fail(String.format("%s: unexpected value '%s'; want '%s' at line %d, column %d", t.name, r.token(), t.output[i][j], i + 1, j + 1));
+						}
+						j++;
+					}
+					if (j != 0) {
+						j = 0;
+						i++;
+					}
+				}
+				if (t.error != null) {
+					fail(String.format("%s: error '%s', want error '%s'", t.name, null, t.error));
+				}
+				if (i != t.output.length) {
+					fail(String.format("%s: unexpected number of row %d; want %d", t.name, i, t.output.length));
+				}
+			} catch (Exception e) {
+				if (t.error != null) {
+					if (!e.getMessage().contains(t.error)) {
+						fail(String.format("%s: error '%s', want error '%s'", t.name, e, t.error));
+					} else if (t.line != 0 && (t.line != r.lineno() || t.column != j + 1)) {
+						fail(String.format("%s: error at %d:%d expected %d:%d", t.name, r.lineno(), j + 1, t.line, t.column));
+					}
+				} else {
+					fail(String.format("%s: unexpected error '%s'", t.name, e));
+				}
+			} finally {
+				r.close();
+			}
+		}
+	}
+
+	@Test
 	public void testScanObject() throws IOException {
 		Object[] values = {"text", Math.PI, Math.PI, Integer.MAX_VALUE, Long.MAX_VALUE, true, 'c'};
 		StringBuilder buffer = new StringBuilder();
