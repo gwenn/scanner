@@ -47,7 +47,7 @@ public class CsvScanner extends AbstractCsvScanner<String> implements Iterable<S
 
 	/**
 	 * Extra fields are skipped (when the number of fields is greater than `values` size).
-	 * Returns the number of values read (see #column()).
+	 * Returns the number of values read (see {@link #column}).
 	 * At EOF, returns 0.
 	 * <pre>{@code
 	 * CsvScanner s;

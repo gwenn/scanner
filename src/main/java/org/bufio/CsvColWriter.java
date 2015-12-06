@@ -77,7 +77,7 @@ public class CsvColWriter implements Closeable, Flushable {
 	}
 
 	/**
-	 * @throws IllegalStateException if no header has been specified (#withColumnIndexes(java.util.Map)).
+	 * @throws IllegalStateException if no header has been specified ({@link #withHeaders}).
 	 */
 	public void writerHeaders(boolean useCommentMarker) throws IOException {
 		if (columnIndexes == null || columnIndexes.isEmpty()) {
