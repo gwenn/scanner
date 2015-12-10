@@ -7,7 +7,7 @@ import java.io.Reader;
 /**
  * Port of Go Scanner in Java.
  */
-public abstract class Scanner<T> implements Closeable {
+public abstract class Scanner<T> implements Closeable, CharSequence {
 	// The reader provided by the client.
 	private /*final*/ Reader r;
 	// Maximum size of a token
@@ -144,5 +144,31 @@ public abstract class Scanner<T> implements Closeable {
 	/** @return Position of the first non-processed byte in buffer. */
 	protected int position() {
 		return start;
+	}
+
+	@Override
+	public int length() {
+		return end - start;
+	}
+
+	@Override
+	public char charAt(int index) {
+		if (index < 0 || index >= length()) {
+			throw new IndexOutOfBoundsException("index: " + index);
+		}
+		return buf[start + index];
+	}
+
+	@Override
+	public CharSequence subSequence(int start, int end) {
+		if ((start < 0) || (end < 0) || (start > end) || (end > length())) {
+			throw new IndexOutOfBoundsException();
+		}
+		return new String(buf, this.start + start, end - start);
+	}
+
+	@Override
+	public String toString() {
+		return new String(buf, start, end - start);
 	}
 }

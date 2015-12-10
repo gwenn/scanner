@@ -30,12 +30,12 @@ public class CsvWriter implements Closeable, Flushable {
 	private final boolean quoted;
 	// True to use \r\n as the line terminator
 	private boolean useCRLF;
-	// true at start of row
-	private boolean sor;
 	// character marking the start of a line comment.
 	private char comment;
 	private Marshaler marshaler;
 
+	// true at start of row
+	private boolean sor;
 	private char[] buf;
 
 	/** Creates a "standard" CSV writer (separator is comma and quoted mode active) */
