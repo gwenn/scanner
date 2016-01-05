@@ -1,5 +1,7 @@
 package org.bufio;
 
+import com.google.common.base.Splitter;
+import com.google.common.io.LineReader;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -11,6 +13,7 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -30,6 +33,40 @@ public class CsvScannerBenchmark {
 			CsvScanner s = new CsvScanner(r);
 			while (s.scan()) {
 				blackhole.consume(s.value());
+			}
+		} finally {
+			r.close();
+		}
+	}
+
+	@Benchmark
+	public void testStringSplit(Blackhole blackhole) throws IOException {
+		Reader r = new InputStreamReader(getClass().getResourceAsStream("/mhtdata.csv"), "UTF-8");
+		try {
+			BufferedReader s = new BufferedReader(r);
+			String line;
+			while ((line = s.readLine()) != null) {
+				String[] values = line.split(",");
+				for (String value : values) {
+					blackhole.consume(value);
+				}
+			}
+		} finally {
+			r.close();
+		}
+	}
+
+	@Benchmark
+	public void testSplitter(Blackhole blackhole) throws IOException {
+		Reader r = new InputStreamReader(getClass().getResourceAsStream("/mhtdata.csv"), "UTF-8");
+		try {
+			LineReader s = new LineReader(r);
+			Splitter splitter = Splitter.on(',');
+			String line;
+			while ((line = s.readLine()) != null) {
+				for (String value : splitter.split(line)) {
+					blackhole.consume(value);
+				}
 			}
 		} finally {
 			r.close();

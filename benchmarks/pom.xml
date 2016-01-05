@@ -30,12 +30,17 @@
             <artifactId>scanner</artifactId>
             <version>0.1.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0</version>
+        </dependency>
     </dependencies>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jmh.version>1.10.1</jmh.version>
-        <javac.target>1.6</javac.target>
+        <jmh.version>1.11.2</jmh.version>
+        <javac.target>1.8</javac.target>
         <uberjar.name>benchmarks</uberjar.name>
     </properties>
 
