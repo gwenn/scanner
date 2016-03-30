@@ -10,6 +10,8 @@ import java.io.Reader;
 public abstract class Scanner<T> implements Closeable, CharSequence {
 	// The reader provided by the client.
 	private /*final*/ Reader r;
+	// The function to split the tokens.
+	private SplitFunc<T> splitFunc;
 	// Maximum size of a token
 	private final int maxTokenSize;
 	// Last token returned by split.
@@ -40,6 +42,13 @@ public abstract class Scanner<T> implements Closeable, CharSequence {
 		eof = false;
 	}
 
+	/**
+	 * @param splitFunc The function to split the tokens.
+	 */
+	public void setSplitFunc(SplitFunc<T> splitFunc) {
+		this.splitFunc = splitFunc;
+	}
+
 	/** Advances the Scanner to the next token, which will then be
 	 * available through the {@link #token} method.
 	 * @return false when the scan stops, by reaching the end of the input.
@@ -50,7 +59,7 @@ public abstract class Scanner<T> implements Closeable, CharSequence {
 			// See if we can get a token with what we already have.
 			if (end > start || eof) {
 				final int pstart = start;
-				token = split(buf, start, end, eof);
+				token = splitFunc.split(buf, start, end, eof);
 				if (token != null) {
 					return true;
 				} else if (pstart != start) {
@@ -99,10 +108,7 @@ public abstract class Scanner<T> implements Closeable, CharSequence {
 		}
 	}
 
-	/** The function to split the tokens. */
-	protected abstract T split(char[] data, int start, int end, boolean atEOF) throws ScanException;
-
-	/** @return The token returned by {@link #split} function */
+	/** @return The token returned by {@link SplitFunc#split} function */
 	protected T token() {
 		return token;
 	}
@@ -128,7 +134,7 @@ public abstract class Scanner<T> implements Closeable, CharSequence {
 		r.close();
 	}
 
-	/** Used by {@link #split} function to advance the input.
+	/** Used by {@link SplitFunc#split} function to advance the input.
 	 * @param n the number of bytes.
 	 */
 	protected void advance(int n) throws ScanException {

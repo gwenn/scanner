@@ -62,7 +62,7 @@ class WriteTest {
 		return this;
 	}
 
-	static final List<WriteTest> tests = new ArrayList<WriteTest>();
+	static final List<WriteTest> tests = new ArrayList<>();
 
 	static {
 		tests.add(new WriteTest("Single", new String[][]{{"abc"}}, "abc\n"));

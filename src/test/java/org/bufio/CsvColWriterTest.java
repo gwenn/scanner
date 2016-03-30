@@ -17,12 +17,11 @@ public class CsvColWriterTest {
 	public void testWriteRow() throws IOException {
 		for (WriteTest t : WriteTest.tests) {
 			final StringWriter s = new StringWriter();
-			CsvColWriter w = t.createColWriter(s);
-			try {
+			try (CsvColWriter w = t.createColWriter(s)) {
 				for (String[] row : t.input) {
 					final List<Integer> indexes = randomIndexes(row.length);
 					for (int i : indexes) {
-						w.setString(i, row[i-1]);
+						w.setString(i, row[i - 1]);
 					}
 					w.endOfRow();
 				}
@@ -41,8 +40,6 @@ public class CsvColWriterTest {
 				} else {
 					fail(String.format("%s: unexpected error '%s'", t.name, e));
 				}
-			} finally {
-				w.close();
 			}
 		}
 	}
@@ -90,7 +87,7 @@ public class CsvColWriterTest {
 	}
 
 	private static List<Integer> randomIndexes(int length) {
-		final List<Integer> indexes = new ArrayList<Integer>(length);
+		final List<Integer> indexes = new ArrayList<>(length);
 		for (int i = 0; i < length; i++) {
 			indexes.add(i + 1);
 		}

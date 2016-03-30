@@ -131,23 +131,20 @@ test:
 	private ResultSet proxy(final CsvReader r, final int columnCount) {
 		return (ResultSet) Proxy.newProxyInstance(this.getClass().getClassLoader(),
 				new Class[]{ResultSet.class, ResultSetMetaData.class},
-				new InvocationHandler() {
-			@Override
-			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-				final String methodName = method.getName();
-				if ("getMetaData".equals(methodName)) {
-					return proxy;
-				} else if ("getColumnCount".equals(methodName)) {
-					return columnCount;
-				} else if ("next".equals(methodName)) {
-					return r.next();
-				} else if ("getObject".equals(methodName)) {
-					return r.getString((Integer) args[0]);
-				} else if ("toString".equals(methodName)) {
-					return r.toString();
-				}
-				throw new UnsupportedOperationException(String.format("%s(%s)", methodName, Arrays.toString(args)));
-			}
-		});
+				(proxy, method, args) -> {
+					final String methodName = method.getName();
+					if ("getMetaData".equals(methodName)) {
+						return proxy;
+					} else if ("getColumnCount".equals(methodName)) {
+						return columnCount;
+					} else if ("next".equals(methodName)) {
+						return r.next();
+					} else if ("getObject".equals(methodName)) {
+						return r.getString((Integer) args[0]);
+					} else if ("toString".equals(methodName)) {
+						return r.toString();
+					}
+					throw new UnsupportedOperationException(String.format("%s(%s)", methodName, Arrays.toString(args)));
+				});
 	}
 }

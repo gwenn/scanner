@@ -32,6 +32,20 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
 
 	protected AbstractCsvScanner(Reader r, char sep, boolean quoted) {
 		super(r);
+		setSplitFunc((data, start, end, atEOF) -> {
+			if (eor) {
+				column = 1;
+			} else {
+				column++;
+			}
+			final T token1 = _split(data, start, end, atEOF);
+			if (token1 == null) {
+				if (column > 1) {
+					column--;
+				}
+			}
+			return token1;
+		});
 		this.sep = sep;
 		this.quoted = quoted;
 		skipEmptyLines = true;
@@ -69,21 +83,6 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
 		return eor;
 	}
 
-	@Override
-	protected T split(char[] data, int start, int end, boolean atEOF) throws ScanException {
-		if (eor) {
-			column = 1;
-		} else {
-			column++;
-		}
-		final T token = _split(data, start, end, atEOF);
-		if (token == null) {
-			if (column > 1) {
-				column--;
-			}
-		}
-		return token;
-	}
 	private T _split(char[] data, int start, int end, boolean atEOF) throws ScanException {
 		if (atEOF && end == start) {
 			if (eor) {
@@ -122,7 +121,7 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
 					return unescapeQuotes(data, start + 1, i - 2, escapedQuotes);
 				}
 				if (pc == '"' && c != '\r') {
-					throw new ScanException(String.format("unescaped %c character at line %d", pc, lineno));
+					throw new ScanException(String.format("unescaped %c character between lines %d and %d", pc, startLineno, lineno));
 				}
 				ppc = pc;
 				pc = c;

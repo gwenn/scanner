@@ -28,21 +28,17 @@ import java.util.concurrent.TimeUnit;
 public class CsvScannerBenchmark {
 	@Benchmark
 	public void testCsvScanner(Blackhole blackhole) throws IOException {
-		Reader r = new InputStreamReader(getClass().getResourceAsStream("/mhtdata.csv"), "UTF-8");
-		try {
+		try (Reader r = new InputStreamReader(getClass().getResourceAsStream("/mhtdata.csv"), "UTF-8")) {
 			CsvScanner s = new CsvScanner(r);
 			while (s.scan()) {
 				blackhole.consume(s.value());
 			}
-		} finally {
-			r.close();
 		}
 	}
 
 	@Benchmark
 	public void testStringSplit(Blackhole blackhole) throws IOException {
-		Reader r = new InputStreamReader(getClass().getResourceAsStream("/mhtdata.csv"), "UTF-8");
-		try {
+		try (Reader r = new InputStreamReader(getClass().getResourceAsStream("/mhtdata.csv"), "UTF-8")) {
 			BufferedReader s = new BufferedReader(r);
 			String line;
 			while ((line = s.readLine()) != null) {
@@ -51,15 +47,12 @@ public class CsvScannerBenchmark {
 					blackhole.consume(value);
 				}
 			}
-		} finally {
-			r.close();
 		}
 	}
 
 	@Benchmark
 	public void testSplitter(Blackhole blackhole) throws IOException {
-		Reader r = new InputStreamReader(getClass().getResourceAsStream("/mhtdata.csv"), "UTF-8");
-		try {
+		try (Reader r = new InputStreamReader(getClass().getResourceAsStream("/mhtdata.csv"), "UTF-8")) {
 			LineReader s = new LineReader(r);
 			Splitter splitter = Splitter.on(',');
 			String line;
@@ -68,8 +61,6 @@ public class CsvScannerBenchmark {
 					blackhole.consume(value);
 				}
 			}
-		} finally {
-			r.close();
 		}
 	}
 

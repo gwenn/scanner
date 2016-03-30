@@ -12,8 +12,7 @@ public class CsvWriterTest {
 	public void testWriteRow() throws IOException {
 		for (WriteTest t : WriteTest.tests) {
 			final StringWriter s = new StringWriter();
-			CsvWriter w = t.createWriter(s);
-			try {
+			try (CsvWriter w = t.createWriter(s)) {
 				for (String[] row : t.input) {
 					w.writeRow(row);
 				}
@@ -32,8 +31,6 @@ public class CsvWriterTest {
 				} else {
 					fail(String.format("%s: unexpected error '%s'", t.name, e));
 				}
-			} finally {
-				w.close();
 			}
 		}
 	}
@@ -42,8 +39,7 @@ public class CsvWriterTest {
 	public void testWriteValue() throws IOException {
 		for (WriteTest t : WriteTest.tests) {
 			final StringWriter s = new StringWriter();
-			CsvWriter w = t.createWriter(s);
-			try {
+			try (CsvWriter w = t.createWriter(s)) {
 				for (String[] row : t.input) {
 					for (String v : row) {
 						w.writeValue(v); // FIXME create specific tests...
@@ -65,8 +61,6 @@ public class CsvWriterTest {
 				} else {
 					fail(String.format("%s: unexpected error '%s'", t.name, e));
 				}
-			} finally {
-				w.close();
 			}
 		}
 	}

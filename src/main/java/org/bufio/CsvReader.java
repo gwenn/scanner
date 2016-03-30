@@ -9,6 +9,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Provides an interface for reading CSV data by row
@@ -73,7 +77,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 		if (n == 0) {
 			return Collections.emptyMap();
 		}
-		columnIndexes = new HashMap<String, Integer>(n);
+		columnIndexes = new HashMap<>(n);
 		for (int j = 0; j < n; j++) {
 			columnIndexes.put(row[j], j + 1);
 		}
@@ -327,6 +331,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 	public void setUnmarshaler(Unmarshaler unmarshaler) {
 		this.unmarshaler = unmarshaler;
 	}
+
 	@Override
 	public void close() throws IOException {
 		impl.close();
@@ -367,7 +372,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 						return false;
 					}
 				} catch (IOException e) {
-					throw new IllegalStateException(e);
+					throw new IllegalStateException(e); // TODO https://projectlombok.org/features/SneakyThrows.html
 				}
 			}
 			@Override
@@ -388,12 +393,55 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 		READY, NOT_READY, DONE, FAILED,
 	}
 
+	/**
+	 * @return a sequential {@code Stream} over the elements in this reader.
+	 */
+	public Stream<String[]> stream() {
+		return StreamSupport.stream(new CsvSpliterator(this), false);
+	}
+	private static class CsvSpliterator implements Spliterator<String[]> {
+		private final CsvReader reader;
+
+		private CsvSpliterator(CsvReader reader) {
+			this.reader = reader;
+		}
+
+		@Override
+		public boolean tryAdvance(Consumer<? super String[]> action) {
+			try {
+				if (reader.next()) {
+					action.accept(reader.values());
+					return true;
+				}
+				return false;
+			} catch (IOException e) {
+				throw new IllegalStateException(e); // TODO https://projectlombok.org/features/SneakyThrows.html
+			}
+		}
+
+		@Override
+		public Spliterator<String[]> trySplit() {
+			return null;
+		}
+
+		@Override
+		public long estimateSize() {
+			return Long.MAX_VALUE;
+		}
+
+		@Override
+		public int characteristics() {
+			return Spliterator.ORDERED | Spliterator.NONNULL;
+		}
+	}
+
 	static Map<String, Integer> toColumnIndexes(Iterable<String> headers) {
-		final Map<String, Integer> columnIndexes = new HashMap<String, Integer>();
+		final Map<String, Integer> columnIndexes = new HashMap<>();
 		int i = 1;
 		for (String header : headers) {
 			columnIndexes.put(header, i++);
 		}
 		return columnIndexes;
 	}
+
 }

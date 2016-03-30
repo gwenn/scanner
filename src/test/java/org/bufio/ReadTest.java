@@ -64,7 +64,7 @@ class ReadTest {
 		return this;
 	}
 
-	static final List<ReadTest> tests = new ArrayList<ReadTest>();
+	static final List<ReadTest> tests = new ArrayList<>();
 
 	static {
 		tests.add(new ReadTest("Simple", "a,b,c\n", new String[][]{{"a", "b", "c"}}));

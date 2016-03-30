@@ -45,7 +45,7 @@ public class CsvColWriter implements Closeable, Flushable {
 	}
 
 	public void withHeaders(Collection<String> headers) {
-		this.headers = new ArrayList<String>(headers);
+		this.headers = new ArrayList<>(headers);
 		this.columnIndexes = CsvReader.toColumnIndexes(headers);
 	}
 
