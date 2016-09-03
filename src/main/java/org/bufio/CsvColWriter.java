@@ -1,5 +1,9 @@
 package org.bufio;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
@@ -36,20 +40,21 @@ public class CsvColWriter implements Closeable, Flushable {
 	private List<String> headers;
 	private Map<String, Integer> columnIndexes;
 
-	public CsvColWriter(Writer w) {
+	public CsvColWriter(@WillCloseWhenClosed @Nonnull Writer w) {
 		writer = new CsvWriter(w);
 	}
 
-	public CsvColWriter(Writer w, char sep, boolean quoted) {
+	public CsvColWriter(@WillCloseWhenClosed @Nonnull Writer w, char sep, boolean quoted) {
 		writer = new CsvWriter(w, sep, quoted);
 	}
 
-	public void withHeaders(Collection<String> headers) {
+	public void withHeaders(@Nonnull Collection<String> headers) {
 		this.headers = new ArrayList<>(headers);
 		this.columnIndexes = CsvReader.toColumnIndexes(headers);
 	}
 
 	/** @see java.sql.ResultSet#findColumn(String) */
+	@Nonnegative
 	public int findColumn(String columnLabel) throws IllegalStateException {
 		if (columnIndexes == null || columnIndexes.isEmpty()) {
 			throw new IllegalStateException("No header");
@@ -61,7 +66,7 @@ public class CsvColWriter implements Closeable, Flushable {
 		return columnIndex;
 	}
 
-	public String getColumnLabel(int columnIndex) throws ScanException {
+	public String getColumnLabel(@Nonnegative int columnIndex) throws ScanException {
 		if (columnIndexes == null || columnIndexes.isEmpty()) {
 			throw new ScanException("No header");
 		}
@@ -94,7 +99,7 @@ public class CsvColWriter implements Closeable, Flushable {
 	 * @param columnIndex the first column is 1, the second is 2, ...
 	 * @param x the column value
 	 */
-	public void setString(int columnIndex, String x) {
+	public void setString(@Nonnegative int columnIndex, String x) {
 		setObject(columnIndex, x);
 	}
 	public void setString(String columnLabel, String x) {
@@ -171,7 +176,7 @@ public class CsvColWriter implements Closeable, Flushable {
 	 * @param columnIndex the first column is 1, the second is 2, ...
 	 * @param x the column value
 	 */
-	public void setObject(int columnIndex, Object x) {
+	public void setObject(@Nonnegative int columnIndex, @Nullable Object x) {
 		final int i = columnIndex - 1;
 		if (i == row.length) {
 			row = Arrays.copyOf(row, i * 2); // FIXME limit
@@ -179,7 +184,7 @@ public class CsvColWriter implements Closeable, Flushable {
 		n = Math.max(n, columnIndex);
 		row[i] = x;
 	}
-	public void setObject(String columnLabel, Object x) {
+	public void setObject(String columnLabel, @Nullable Object x) {
 		setObject(findColumn(columnLabel), x);
 	}
 
@@ -202,7 +207,7 @@ public class CsvColWriter implements Closeable, Flushable {
 	}
 
 	/** Sets the component called by {@link #setObject} to marshall value to text. */
-	public void setMarshaler(Marshaler marshaler) {
+	public void setMarshaler(@Nullable Marshaler marshaler) {
 		writer.setMarshaler(marshaler);
 	}
 

@@ -1,5 +1,9 @@
 package org.bufio;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
@@ -38,7 +42,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 	/**
 	 * Creates a "standard" CSV reader (separator is comma and quoted mode active)
 	 */
-	public CsvReader(Reader r) {
+	public CsvReader(@WillCloseWhenClosed @Nonnull Reader r) {
 		impl = new CsvScanner(r);
 	}
 
@@ -46,22 +50,23 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 	 * Returns a new CSV scanner to read from `r`.
 	 * When `quoted` is false, values must not contain a separator or newline.
 	 */
-	public CsvReader(Reader r, char sep, boolean quoted) {
+	public CsvReader(@WillCloseWhenClosed @Nonnull Reader r, char sep, boolean quoted) {
 		impl = new CsvScanner(r, sep, quoted);
 	}
 
 	/** Reuse this component with a new content. */
-	public final void reset(Reader r) {
+	public final void reset(@WillCloseWhenClosed @Nonnull Reader r) throws IOException {
 		impl.reset(r);
 		n = 0;
 		columnIndexes = null; // TODO validate
 		wasNull = null;
 	}
 
-	public void withHeaders(Iterable<String> headers) {
+	public void withHeaders(@Nonnull Iterable<String> headers) {
 		columnIndexes = toColumnIndexes(headers);
 	}
 
+	@Nonnull
 	public Map<String,Integer> scanHeaders(boolean ignoreCommentMarker) throws IOException {
 		char pcm = '\0';
 		if (ignoreCommentMarker) {
@@ -104,6 +109,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 		wasNull = null;
 	}
 
+	@Nonnull
 	public String[] values() {
 		return Arrays.copyOf(row, n);
 	}
@@ -112,7 +118,8 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 	 * @param columnIndex the first column is 1, the second is 2, ...
 	 * @see java.sql.ResultSet#getString(int)
 	 */
-	public String getString(int columnIndex) throws ScanException {
+	@Nullable
+	public String getString(@Nonnegative int columnIndex) throws ScanException {
 		if (n == 0) {
 			throw new ScanException("No row");
 		}
@@ -140,7 +147,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 	 * @param columnIndex the first column is 1, the second is 2, ...
 	 * @see java.sql.ResultSet#getByte(int)
 	 */
-	public byte getByte(int columnIndex) throws ScanException {
+	public byte getByte(@Nonnegative int columnIndex) throws ScanException {
 		final String value = getString(columnIndex);
 		if (emptyIsNull && wasNull) {
 			return 0;
@@ -156,7 +163,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 	 * @param columnIndex the first column is 1, the second is 2, ...
 	 * @see java.sql.ResultSet#getShort(int)
 	 */
-	public short getShort(int columnIndex) throws ScanException {
+	public short getShort(@Nonnegative int columnIndex) throws ScanException {
 		final String value = getString(columnIndex);
 		if (emptyIsNull && wasNull) {
 			return 0;
@@ -172,7 +179,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 	 * @param columnIndex the first column is 1, the second is 2, ...
 	 * @see java.sql.ResultSet#getInt(int)
 	 */
-	public int getInt(int columnIndex) throws ScanException {
+	public int getInt(@Nonnegative int columnIndex) throws ScanException {
 		final String value = getString(columnIndex);
 		if (emptyIsNull && wasNull) {
 			return 0;
@@ -188,7 +195,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 	 * @param columnIndex the first column is 1, the second is 2, ...
 	 * @see java.sql.ResultSet#getLong(int)
 	 */
-	public long getLong(int columnIndex) throws ScanException {
+	public long getLong(@Nonnegative int columnIndex) throws ScanException {
 		final String value = getString(columnIndex);
 		if (emptyIsNull && wasNull) {
 			return 0;
@@ -204,7 +211,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 	 * @param columnIndex the first column is 1, the second is 2, ...
 	 * @see java.sql.ResultSet#getFloat(int)
 	 */
-	public float getFloat(int columnIndex) throws ScanException {
+	public float getFloat(@Nonnegative int columnIndex) throws ScanException {
 		final String value = getString(columnIndex);
 		if (emptyIsNull && wasNull) {
 			return 0;
@@ -220,7 +227,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 	 * @param columnIndex the first column is 1, the second is 2, ...
 	 * @see java.sql.ResultSet#getDouble(int)
 	 */
-	public double getDouble(int columnIndex) throws ScanException {
+	public double getDouble(@Nonnegative int columnIndex) throws ScanException {
 		final String value = getString(columnIndex);
 		if (emptyIsNull && wasNull) {
 			return 0;
@@ -235,7 +242,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 	/**
 	 * @param columnIndex the first column is 1, the second is 2, ...
 	 * @see java.sql.ResultSet#getObject(int, Class) */
-	public <T> T getObject(int columnIndex, Class<T> type) throws ScanException {
+	public <T> T getObject(@Nonnegative int columnIndex, Class<T> type) throws ScanException {
 		if (unmarshaler == null) {
 			throw new IllegalStateException("No unmarshaler set");
 		}
@@ -262,7 +269,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 	/**
 	 * Skips `n` rows
 	 */
-	public void skipRows(int n) throws IOException {
+	public void skipRows(@Nonnegative int n) throws IOException {
 		impl.skipRows(n);
 	}
 
@@ -270,10 +277,12 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 	 * Returns current line number.
 	 * @see java.sql.ResultSet#getRow
 	 */
+	@Nonnegative
 	public int getRow() { // FIXME row versus lineno
 		return impl.lineno();
 	}
 	/** @see java.sql.ResultSetMetaData#getColumnCount() */
+	@Nonnegative
 	public int getColumnCount() {
 		return n;
 	}
@@ -282,7 +291,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 	 * @param columnIndex the first column is 1, the second is 2, ...
 	 * @see java.sql.ResultSetMetaData#getColumnLabel(int)
 	 */
-	public String getColumnLabel(int columnIndex) throws ScanException {
+	public String getColumnLabel(@Nonnegative int columnIndex) throws ScanException {
 		if (columnIndexes == null || columnIndexes.isEmpty()) {
 			throw new ScanException("No header");
 		}
@@ -328,7 +337,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 	}
 
 	/** Sets the component used by {@link #getObject} to transform text to object. */
-	public void setUnmarshaler(Unmarshaler unmarshaler) {
+	public void setUnmarshaler(@Nullable Unmarshaler unmarshaler) {
 		this.unmarshaler = unmarshaler;
 	}
 
@@ -349,6 +358,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 	 * @throws IllegalStateException for IOException.
 	 */
 	@Override
+	@Nonnull
 	public Iterator<String[]> iterator() {
 		return new Iterator<String[]>() {
 			private State state = State.NOT_READY;
@@ -396,6 +406,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 	/**
 	 * @return a sequential {@code Stream} over the elements in this reader.
 	 */
+	@Nonnull
 	public Stream<String[]> stream() {
 		return StreamSupport.stream(new CsvSpliterator(this), false);
 	}

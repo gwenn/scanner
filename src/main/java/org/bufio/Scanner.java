@@ -1,5 +1,9 @@
 package org.bufio;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.annotation.OverridingMethodsMustInvokeSuper;
+import javax.annotation.WillCloseWhenClosed;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
@@ -25,27 +29,37 @@ public abstract class Scanner<T> implements Closeable, CharSequence {
 
 	private boolean eof;
 
-	protected Scanner(Reader r) {
-		reset(r);
+	protected Scanner(@WillCloseWhenClosed @Nonnull Reader r) {
+		init(r);
 		maxTokenSize = 64 * 1024;
 		buf = new char[4096]; // Plausible starting size; needn't be large.
 	}
 
 	/** Reuse this scanner with a new content. */
-	protected void reset(Reader r) {
+	@OverridingMethodsMustInvokeSuper
+	protected void reset(@WillCloseWhenClosed @Nonnull Reader r) throws IOException {
+		if (this.r != null) {
+			close();
+		}
+		init(r);
+	}
+
+	@OverridingMethodsMustInvokeSuper
+	protected void init(Reader r) {
 		if (r == null) {
 			throw new IllegalArgumentException("null reader");
 		}
 		this.r = r;
 		token = null;
-		start = 0; end = 0;
+		start = 0;
+		end = 0;
 		eof = false;
 	}
 
 	/**
 	 * @param splitFunc The function to split the tokens.
 	 */
-	public void setSplitFunc(SplitFunc<T> splitFunc) {
+	public void setSplitFunc(@Nonnull SplitFunc<T> splitFunc) {
 		this.splitFunc = splitFunc;
 	}
 
@@ -137,7 +151,7 @@ public abstract class Scanner<T> implements Closeable, CharSequence {
 	/** Used by {@link SplitFunc#split} function to advance the input.
 	 * @param n the number of bytes.
 	 */
-	protected void advance(int n) throws ScanException {
+	protected void advance(@Nonnegative int n) throws ScanException {
 		if (n < 0) {
 			throw new ScanException("SplitFunc returns negative advance count");
 		}
@@ -148,6 +162,7 @@ public abstract class Scanner<T> implements Closeable, CharSequence {
 	}
 
 	/** @return Position of the first non-processed byte in buffer. */
+	@Nonnegative
 	protected int position() {
 		return start;
 	}
@@ -158,7 +173,7 @@ public abstract class Scanner<T> implements Closeable, CharSequence {
 	}
 
 	@Override
-	public char charAt(int index) {
+	public char charAt(@Nonnegative int index) {
 		if (index < 0 || index >= length()) {
 			throw new IndexOutOfBoundsException("index: " + index);
 		}
@@ -166,7 +181,7 @@ public abstract class Scanner<T> implements Closeable, CharSequence {
 	}
 
 	@Override
-	public CharSequence subSequence(int start, int end) {
+	public CharSequence subSequence(@Nonnegative int start, @Nonnegative int end) {
 		if ((start < 0) || (end < 0) || (start > end) || (end > length())) {
 			throw new IndexOutOfBoundsException();
 		}

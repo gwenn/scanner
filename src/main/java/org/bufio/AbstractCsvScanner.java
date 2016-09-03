@@ -1,5 +1,8 @@
 package org.bufio;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.annotation.WillCloseWhenClosed;
 import java.io.IOException;
 import java.io.Reader;
 
@@ -26,11 +29,11 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
 	/**
 	 * Creates a "standard" CSV reader (separator is comma and quoted mode active)
 	 */
-	protected AbstractCsvScanner(Reader r) {
+	protected AbstractCsvScanner(@WillCloseWhenClosed @Nonnull Reader r) {
 		this(r, ',', true);
 	}
 
-	protected AbstractCsvScanner(Reader r, char sep, boolean quoted) {
+	protected AbstractCsvScanner(@WillCloseWhenClosed @Nonnull Reader r, char sep, boolean quoted) {
 		super(r);
 		setSplitFunc((data, start, end, atEOF) -> {
 			if (eor) {
@@ -53,18 +56,24 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
 	}
 
 	@Override
-	public final void reset(Reader r) {
+	public final void reset(@WillCloseWhenClosed @Nonnull Reader r) throws IOException {
 		super.reset(r);
+	}
+
+	@Override
+	protected void init(Reader r) {
+		super.init(r);
 		lineno = 1;
 		eor = true;
 		column = 0;
 	}
 
-	protected abstract T newToken(char[] data, int start, int end);
+	protected abstract T newToken(@Nonnull char[] data, @Nonnegative int start, @Nonnegative int end);
 
 	/**
 	 * Returns current line number
 	 */
+	@Nonnegative
 	public int lineno() {
 		return lineno;
 	}
@@ -72,6 +81,7 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
 	/**
 	 * Returns current column (first column is 1).
 	 */
+	@Nonnegative
 	public int column() {
 		return column;
 	}
@@ -179,7 +189,7 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
 	/**
 	 * Skips `n` rows
 	 */
-	public void skipRows(int n) throws IOException {
+	public void skipRows(@Nonnegative int n) throws IOException {
 		int i = 0;
 		while (i < n && scan()) {
 			if (eor) {

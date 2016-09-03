@@ -1,5 +1,9 @@
 package org.bufio;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
@@ -25,7 +29,7 @@ public class CsvScanner extends AbstractCsvScanner<String> implements Iterable<S
 	/**
 	 * Creates a "standard" CSV reader (separator is comma and quoted mode active)
 	 */
-	public CsvScanner(Reader r) {
+	public CsvScanner(@WillCloseWhenClosed @Nonnull Reader r) {
 		super(r);
 	}
 
@@ -33,12 +37,12 @@ public class CsvScanner extends AbstractCsvScanner<String> implements Iterable<S
 	 * Returns a new CSV scanner to read from `r`.
 	 * When `quoted` is false, values must not contain a separator or newline.
 	 */
-	public CsvScanner(Reader r, char sep, boolean quoted) {
+	public CsvScanner(@WillCloseWhenClosed @Nonnull Reader r, char sep, boolean quoted) {
 		super(r, sep, quoted);
 	}
 
 	@Override
-	protected String newToken(char[] data, int start, int end) {
+	protected String newToken(@Nonnull char[] data, @Nonnegative int start, @Nonnegative int end) {
 		if (start == end) {
 			return "";
 		}
@@ -59,7 +63,8 @@ public class CsvScanner extends AbstractCsvScanner<String> implements Iterable<S
 	 * }
 	 * }</pre>
 	 */
-	public int scanRow(String[] values) throws IOException {
+	@Nonnegative
+	public int scanRow(@Nonnull String[] values) throws IOException {
 		int i;
 		for (i = 0; i < values.length && scan(); i++) {
 			values[i] = value();
@@ -80,6 +85,7 @@ public class CsvScanner extends AbstractCsvScanner<String> implements Iterable<S
 	}
 
 	/** Reads text until next separator or eol/eof. */
+	@Nullable
 	public String scanText() throws IOException {
 		if (scan()) {
 			return value();
@@ -104,7 +110,7 @@ public class CsvScanner extends AbstractCsvScanner<String> implements Iterable<S
 	}
 
 	/** Reads bool until next separator or eol/eof. */
-	public boolean scanBool(String trueValue) throws IOException {
+	public boolean scanBool(@Nonnull String trueValue) throws IOException {
 		return trueValue.equals(scanText());
 	}
 	/** Reads char until next separator or eol/eof. */
@@ -130,6 +136,7 @@ public class CsvScanner extends AbstractCsvScanner<String> implements Iterable<S
 	 * @throws IllegalStateException for IOException.
 	 */
 	@Override
+	@Nonnull
 	public Iterator<String> iterator() {
 		return new Iterator<String>() {
 			private State state = State.NOT_READY;

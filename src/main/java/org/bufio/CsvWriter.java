@@ -1,5 +1,8 @@
 package org.bufio;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
@@ -39,12 +42,12 @@ public class CsvWriter implements Closeable, Flushable {
 	private char[] buf;
 
 	/** Creates a "standard" CSV writer (separator is comma and quoted mode active) */
-	public CsvWriter(Writer w) {
+	public CsvWriter(@WillCloseWhenClosed @Nonnull Writer w) {
 		this(w, ',', true);
 	}
 
 	/** Returns a new CSV writer */
-	public CsvWriter(Writer w, char sep, boolean quoted) {
+	public CsvWriter(@WillCloseWhenClosed @Nonnull Writer w, char sep, boolean quoted) {
 		if (w == null) {
 			throw new IllegalArgumentException("null writer");
 		}
@@ -56,7 +59,7 @@ public class CsvWriter implements Closeable, Flushable {
 	}
 
 	// Exports result to CSV.
-	public void writeResultSet(ResultSet rs/*TODO, String nullValue*/, boolean headers) throws IOException, SQLException {
+	public void writeResultSet(@Nonnull ResultSet rs/*TODO, String nullValue*/, boolean headers) throws IOException, SQLException {
 		final ResultSetMetaData metaData = rs.getMetaData();
 		final int nCol = metaData.getColumnCount();
 		if (headers) {
@@ -83,7 +86,7 @@ public class CsvWriter implements Closeable, Flushable {
 		}
 		endOfRow();
 	}
-	public void writeRow(Iterable<?> values) throws IOException {
+	public void writeRow(@Nonnull Iterable<?> values) throws IOException {
 		for (Object value : values) {
 			writeValue(value);
 		}
@@ -104,7 +107,7 @@ public class CsvWriter implements Closeable, Flushable {
 	}
 
 	// Value's type is used to encode value to text.
-	public void writeValue(Object value) throws IOException {
+	public void writeValue(@Nullable Object value) throws IOException {
 		if (marshaler != null) {
 			write(marshaler.marshal(value));
 		} else if (value == null) {
@@ -126,16 +129,16 @@ public class CsvWriter implements Closeable, Flushable {
 	}
 
 	/** Ensures that value is quoted when needed. */
-	public void write(char[] value) throws IOException {
+	public void write(@Nonnull char[] value) throws IOException {
 		write(value, 0, value.length);
 	}
 
 	/** Ensures that value is quoted when needed. */
-	public void write(String value) throws IOException {
+	public void write(@Nonnull String value) throws IOException {
 		write(value, 0, value.length());
 	}
 
-	public void write(String str, int off, int len) throws IOException {
+	public void write(@Nonnull String str, int off, int len) throws IOException {
 		if (len > buf.length) { // FIXME
 			buf = new char[len];
 		}
@@ -216,7 +219,7 @@ public class CsvWriter implements Closeable, Flushable {
 	}
 
 	/** Sets the component called by {@link #writeValue} to marshall value to text. */
-	public void setMarshaler(Marshaler marshaler) {
+	public void setMarshaler(@Nullable Marshaler marshaler) {
 		this.marshaler = marshaler;
 	}
 
