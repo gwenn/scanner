@@ -102,7 +102,7 @@ public abstract class Scanner<T> implements Closeable, CharSequence {
 		}
 		// Is the buffer full? If so, resize.
 		if (end == buf.length) {
-			if (buf.length >= maxTokenSize) {
+			if (buf.length >= maxTokenSize || buf.length > Integer.MAX_VALUE / 2) {
 				throw new ScanException("token too long");
 			}
 			int newSize = Math.min(buf.length * 2, maxTokenSize);
@@ -111,7 +111,6 @@ public abstract class Scanner<T> implements Closeable, CharSequence {
 			buf = newBuf;
 			end -= start;
 			start = 0;
-			return;
 		}
 		// Finally we can read some input.
 		int n = r.read(buf, end, buf.length - end);
