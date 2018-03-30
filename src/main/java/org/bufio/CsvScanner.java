@@ -172,10 +172,6 @@ public class CsvScanner extends AbstractCsvScanner<String> implements Iterable<S
 				state = CsvScanner.this.atEndOfRow() ? State.DONE : State.NOT_READY;
 				return CsvScanner.this.token();
 			}
-			@Override
-			public void remove() {
-				throw new UnsupportedOperationException();
-			}
 		};
 	}
 	private enum State {

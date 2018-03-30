@@ -442,7 +442,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 
 		@Override
 		public int characteristics() {
-			return Spliterator.ORDERED | Spliterator.NONNULL;
+			return Spliterator.ORDERED | Spliterator.NONNULL | Spliterator.IMMUTABLE;
 		}
 	}
 
