@@ -183,7 +183,7 @@ public class CsvScannerTest {
 			new CsvScanner(null);
 			fail();
 		} catch (IllegalArgumentException e) {
-			assertEquals("null reader", e.getMessage());
+			assertTrue(e.getMessage().contains("null"));
 		}
 	}
 

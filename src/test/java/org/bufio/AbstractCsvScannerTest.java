@@ -2,6 +2,7 @@ package org.bufio;
 
 import org.junit.Test;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -30,7 +31,7 @@ public class AbstractCsvScannerTest {
 		}
 
 		@Override
-		protected CsvRecord newToken(char[] data, int start, int end) {
+		protected CsvRecord newToken(@Nonnull char[] data, int start, int end) {
 			final String s;
 			if (start == end) {
 				s = "";

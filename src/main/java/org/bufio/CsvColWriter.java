@@ -89,7 +89,7 @@ public class CsvColWriter implements Closeable, Flushable {
 			throw new IllegalStateException("No header");
 		}
 		if (useCommentMarker) {
-			writer.writeComment(headers.toArray(new String[headers.size()]));
+			writer.writeComment(headers.toArray(new String[0]));
 		} else {
 			writer.writeRow(headers);
 		}

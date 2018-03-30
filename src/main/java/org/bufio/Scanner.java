@@ -187,6 +187,7 @@ public abstract class Scanner<T> implements Closeable, CharSequence {
 		return new String(buf, this.start + start, end - start);
 	}
 
+	@Nonnull
 	@Override
 	public String toString() {
 		return new String(buf, start, end - start);
