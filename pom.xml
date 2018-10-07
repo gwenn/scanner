@@ -56,43 +56,6 @@
 
   <profiles>
     <profile>
-      <id>parser-generation</id>
-      <activation>
-        <os>
-          <!-- TODO windows support -->
-          <family>unix</family>
-        </os>
-        <file>
-          <missing>${basedir}/src/main/java/org/sqlite/parser/yyParser.java</missing>
-        </file>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>1.6.0</version>
-            <configuration>
-              <executable>make</executable>
-              <arguments>
-                <argument>-C</argument>
-                <argument>${project.basedir}</argument>
-              </arguments>
-            </configuration>
-            <executions>
-              <execution>
-                <id>parser-generation</id>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <phase>generate-sources</phase>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
       <!-- Prevent JavaDoc warnings from failing the build under Java 8... -->
       <id>doclint-java8-disable</id>
       <activation>
