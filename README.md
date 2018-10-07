@@ -5,6 +5,7 @@ All credit goes to:
 * D. Richard Hipp, for his [CSV parser](http://www.sqlite.org/cgi/src/artifact/6276582ee4e9114e) implementation.
 
 [![Build Status](https://travis-ci.org/gwenn/scanner.svg)](https://travis-ci.org/gwenn/scanner)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.gwenn/scanner.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.gwenn%22%20AND%20a:%22scanner%22)
 
 ## Iterating over fields
 
