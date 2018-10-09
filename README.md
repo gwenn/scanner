@@ -6,6 +6,7 @@ All credit goes to:
 
 [![Build Status](https://travis-ci.org/gwenn/scanner.svg)](https://travis-ci.org/gwenn/scanner)
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.gwenn/scanner.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.gwenn%22%20AND%20a:%22scanner%22)
+[![Javadocs](https://www.javadoc.io/badge/com.github.gwenn/scanner.svg)](https://www.javadoc.io/doc/com.github.gwenn/scanner)
 
 ## Iterating over fields
 
