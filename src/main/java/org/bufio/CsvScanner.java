@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -161,7 +162,7 @@ public class CsvScanner extends AbstractCsvScanner<String> implements Iterable<S
 						return false;
 					}
 				} catch (IOException e) {
-					throw new IllegalStateException(e);
+					throw new UncheckedIOException(e);
 				}
 			}
 			@Override

@@ -7,6 +7,7 @@ import javax.annotation.WillCloseWhenClosed;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -382,7 +383,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 						return false;
 					}
 				} catch (IOException e) {
-					throw new IllegalStateException(e); // TODO https://projectlombok.org/features/SneakyThrows.html
+					throw new UncheckedIOException(e); // TODO https://projectlombok.org/features/SneakyThrows.html
 				}
 			}
 			@Override
@@ -426,7 +427,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 				}
 				return false;
 			} catch (IOException e) {
-				throw new IllegalStateException(e); // TODO https://projectlombok.org/features/SneakyThrows.html
+				throw new UncheckedIOException(e); // TODO https://projectlombok.org/features/SneakyThrows.html
 			}
 		}
 
