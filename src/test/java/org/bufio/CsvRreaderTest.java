@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -89,7 +90,7 @@ public class CsvRreaderTest {
 				if (i != t.output.length) {
 					fail(String.format("%s: unexpected number of row %d; want %d", t.name, i, t.output.length));
 				}
-			} catch (IllegalStateException e) {
+			} catch (UncheckedIOException e) {
 				if (t.error != null) {
 					if (!e.getMessage().contains(t.error)) {
 						fail(String.format("%s: error '%s', want error '%s'", t.name, e, t.error));
