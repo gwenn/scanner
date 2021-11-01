@@ -26,14 +26,14 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.bufio</groupId>
+            <groupId>com.github.gwenn</groupId>
             <artifactId>scanner</artifactId>
             <version>0.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>19.0</version>
+            <version>[30.0-jre,)</version>
         </dependency>
     </dependencies>
 
