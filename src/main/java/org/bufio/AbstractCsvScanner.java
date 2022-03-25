@@ -101,7 +101,7 @@ public abstract class AbstractCsvScanner<T> extends Scanner<T> {
 			eor = true;
 			return newToken(data, start, end, false);
 		}
-		if (quoted && start < end && data[start] == '"') { // quoted field (may contains separator, newline and escaped quote)
+		if (quoted && start < end && data[start] == '"') { // quoted field (may contain separator, newline and escaped quote)
 			final int startLineno = lineno;
 			int escapedQuotes = 0;
 			char c = 0, pc = 0, ppc = 0;

@@ -112,7 +112,7 @@ public abstract class Scanner<T> implements Closeable, CharSequence {
 			end -= start;
 			start = 0;
 		}
-		// Finally we can read some input.
+		// Finally, we can read some input.
 		int n = r.read(buf, end, buf.length - end);
 		if (n < 0) {
 			eof = true;

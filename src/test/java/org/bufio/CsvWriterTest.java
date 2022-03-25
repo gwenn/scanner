@@ -21,7 +21,7 @@ public class CsvWriterTest {
 					fail(String.format("%s: error '%s', want error '%s'", t.name, null, t.error));
 				}
 				if (!t.output.equals(s.toString())) {
-					fail(String.format("%s:%n%s%n<>%n%s%n", t.name, t.output, s.toString()));
+					fail(String.format("%s:%n%s%n<>%n%s%n", t.name, t.output, s));
 				}
 			} catch (IOException e) {
 				if (t.error != null) {
@@ -51,7 +51,7 @@ public class CsvWriterTest {
 					fail(String.format("%s: error '%s', want error '%s'", t.name, null, t.error));
 				}
 				if (!t.output.equals(s.toString())) {
-					fail(String.format("%s:%n%s%n<>%n%s%n", t.name, t.output, s.toString()));
+					fail(String.format("%s:%n%s%n<>%n%s%n", t.name, t.output, s));
 				}
 			} catch (IOException e) {
 				if (t.error != null) {
