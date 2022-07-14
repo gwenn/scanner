@@ -53,7 +53,7 @@ public class CsvColWriter implements Closeable, Flushable {
 		this.columnIndexes = CsvReader.toColumnIndexes(headers);
 	}
 
-	/** @see java.sql.ResultSet#findColumn(String) */
+	/** See {@link java.sql.ResultSet#findColumn(String)}. */
 	@Nonnegative
 	public int findColumn(String columnLabel) throws IllegalStateException {
 		if (columnIndexes == null || columnIndexes.isEmpty()) {

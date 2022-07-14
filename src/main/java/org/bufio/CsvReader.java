@@ -90,7 +90,7 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 		return columnIndexes; // TODO clone/copy
 	}
 
-	/** @see java.sql.ResultSet#next */
+	/** See {@link java.sql.ResultSet#next}. */
 	public boolean next() throws IOException {
 		scanRow();
 		return n != 0;
@@ -116,8 +116,8 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 	}
 
 	/**
+	 * See {@link java.sql.ResultSet#getString(int)}.
 	 * @param columnIndex the first column is 1, the second is 2, ...
-	 * @see java.sql.ResultSet#getString(int)
 	 */
 	@Nullable
 	public String getString(@Nonnegative int columnIndex) throws ScanException {
@@ -139,14 +139,14 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 		}
 		return value;
 	}
-	/** @see java.sql.ResultSet#getString(String) */
+	/** See {@link java.sql.ResultSet#getString(String)}. */
 	public String getString(String columnLabel) throws ScanException {
 		return getString(findColumn(columnLabel));
 	}
 
 	/**
+	 * See {@link java.sql.ResultSet#getByte(int)}.
 	 * @param columnIndex the first column is 1, the second is 2, ...
-	 * @see java.sql.ResultSet#getByte(int)
 	 */
 	public byte getByte(@Nonnegative int columnIndex) throws ScanException {
 		final String value = getString(columnIndex);
@@ -155,14 +155,14 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 		}
 		return Byte.parseByte(value);
 	}
-	/** @see java.sql.ResultSet#getByte(String) */
+	/** See {@link java.sql.ResultSet#getByte(String)}. */
 	public byte getByte(String columnLabel) throws ScanException {
 		return getByte(findColumn(columnLabel));
 	}
 
 	/**
+	 * See {@link java.sql.ResultSet#getShort(int)}.
 	 * @param columnIndex the first column is 1, the second is 2, ...
-	 * @see java.sql.ResultSet#getShort(int)
 	 */
 	public short getShort(@Nonnegative int columnIndex) throws ScanException {
 		final String value = getString(columnIndex);
@@ -171,14 +171,14 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 		}
 		return Short.parseShort(value);
 	}
-	/** @see java.sql.ResultSet#getShort(String) */
+	/** See {@link java.sql.ResultSet#getShort(String)}. */
 	public short getShort(String columnLabel) throws ScanException {
 		return getShort(findColumn(columnLabel));
 	}
 
 	/**
+	 * See {@link java.sql.ResultSet#getInt(int)}.
 	 * @param columnIndex the first column is 1, the second is 2, ...
-	 * @see java.sql.ResultSet#getInt(int)
 	 */
 	public int getInt(@Nonnegative int columnIndex) throws ScanException {
 		final String value = getString(columnIndex);
@@ -187,14 +187,14 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 		}
 		return Integer.parseInt(value);
 	}
-	/** @see java.sql.ResultSet#getInt(String) */
+	/** See {@link java.sql.ResultSet#getInt(String)}. */
 	public int getInt(String columnLabel) throws ScanException {
 		return getInt(findColumn(columnLabel));
 	}
 
 	/**
+	 * See {@link java.sql.ResultSet#getLong(int)}.
 	 * @param columnIndex the first column is 1, the second is 2, ...
-	 * @see java.sql.ResultSet#getLong(int)
 	 */
 	public long getLong(@Nonnegative int columnIndex) throws ScanException {
 		final String value = getString(columnIndex);
@@ -203,14 +203,14 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 		}
 		return Long.parseLong(value);
 	}
-	/** @see java.sql.ResultSet#getLong(String) */
+	/** See {@link java.sql.ResultSet#getLong(String)}. */
 	public long getLong(String columnLabel) throws ScanException {
 		return getLong(findColumn(columnLabel));
 	}
 
 	/**
+	 * See {@link java.sql.ResultSet#getFloat(int)}.
 	 * @param columnIndex the first column is 1, the second is 2, ...
-	 * @see java.sql.ResultSet#getFloat(int)
 	 */
 	public float getFloat(@Nonnegative int columnIndex) throws ScanException {
 		final String value = getString(columnIndex);
@@ -219,14 +219,14 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 		}
 		return Float.parseFloat(value);
 	}
-	/** @see java.sql.ResultSet#getFloat(String) */
+	/** See {@link java.sql.ResultSet#getFloat(String)}. */
 	public float getFloat(String columnLabel) throws ScanException {
 		return getFloat(findColumn(columnLabel));
 	}
 
 	/**
+	 * See {@link java.sql.ResultSet#getDouble(int)}.
 	 * @param columnIndex the first column is 1, the second is 2, ...
-	 * @see java.sql.ResultSet#getDouble(int)
 	 */
 	public double getDouble(@Nonnegative int columnIndex) throws ScanException {
 		final String value = getString(columnIndex);
@@ -235,14 +235,15 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 		}
 		return Double.parseDouble(value);
 	}
-	/** @see java.sql.ResultSet#getDouble(String) */
+	/** See {@link java.sql.ResultSet#getDouble(String)}. */
 	public double getDouble(String columnLabel) throws ScanException {
 		return getDouble(findColumn(columnLabel));
 	}
 
 	/**
+	 * See {@link java.sql.ResultSet#getObject(int, Class)}.
 	 * @param columnIndex the first column is 1, the second is 2, ...
-	 * @see java.sql.ResultSet#getObject(int, Class) */
+	 */
 	public <T> T getObject(@Nonnegative int columnIndex, Class<T> type) throws ScanException {
 		if (unmarshaler == null) {
 			throw new IllegalStateException("No unmarshaler set");
@@ -250,12 +251,12 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 		return unmarshaler.unmarshal(getString(columnIndex), type);
 	}
 
-	/** @see java.sql.ResultSet#getObject(String, Class) */
+	/** See {@link java.sql.ResultSet#getObject(String, Class)}. */
 	public <T> T getObject(String columnLabel, Class<T> type) throws ScanException {
 		return getObject(findColumn(columnLabel), type);
 	}
 
-	/** @see java.sql.ResultSet#findColumn(String) */
+	/** See {@link java.sql.ResultSet#findColumn(String)}. */
 	public int findColumn(String columnLabel) throws ScanException {
 		if (columnIndexes == null || columnIndexes.isEmpty()) {
 			throw new ScanException("No header");
@@ -282,15 +283,15 @@ public class CsvReader implements Closeable, Iterable<String[]> {
 	public int getRow() { // FIXME row versus lineno
 		return impl.lineno();
 	}
-	/** @see java.sql.ResultSetMetaData#getColumnCount() */
+	/** See {@link java.sql.ResultSetMetaData#getColumnCount()}. */
 	@Nonnegative
 	public int getColumnCount() {
 		return n;
 	}
 
 	/**
+	 * See {@link java.sql.ResultSetMetaData#getColumnLabel(int)}.
 	 * @param columnIndex the first column is 1, the second is 2, ...
-	 * @see java.sql.ResultSetMetaData#getColumnLabel(int)
 	 */
 	public String getColumnLabel(@Nonnegative int columnIndex) throws ScanException {
 		if (columnIndexes == null || columnIndexes.isEmpty()) {
