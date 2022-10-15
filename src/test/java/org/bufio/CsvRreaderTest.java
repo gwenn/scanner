@@ -174,7 +174,7 @@ public class CsvRreaderTest {
 		assertTrue(r.wasNull());
 		assertEquals(0, r.getInt(4));
 		assertTrue(r.wasNull());
-		assertEquals(0l, r.getLong(5));
+		assertEquals(0L, r.getLong(5));
 		assertTrue(r.wasNull());
 		assertEquals(0, r.getByte(7));
 		assertTrue(r.wasNull());
@@ -285,7 +285,7 @@ public class CsvRreaderTest {
 			if (i > 0) {
 				buffer.append(',');
 			}
-			buffer.append(String.valueOf(values[i]));
+			buffer.append(values[i]);
 		}
 		return buffer.toString();
 	}

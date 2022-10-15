@@ -161,7 +161,7 @@ public class CsvScannerTest {
 		Object[] values = {"text", Math.PI, Math.PI, Integer.MAX_VALUE, Long.MAX_VALUE, true, 'c'};
 		StringBuilder buffer = new StringBuilder();
 		for (Object value : values) {
-			buffer.append(String.valueOf(value));
+			buffer.append(value);
 			buffer.append(',');
 		}
 		CsvScanner r = new CsvScanner(new StringReader(buffer.toString()));
